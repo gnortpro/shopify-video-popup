@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  @keyframes storyHoverTransition {
+    0% {
+      width: 0px;
+    }
+
+    100% {
+      width: 100%;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @media (min-width: 640px) {
+    .swiper {
+      padding: 0 16px;
+    }
+
+    .swiper-button-prev {
+      left: -8px;
+    }
+
+    .swiper-button-next {
+      right: -8px;
+    }
+
+    .swiper-pagination {
+      display: none;
+    }
+  }
+}
+
+.story-hover-transition {
+  animation: storyHoverTransition 5s linear;
+  background-color: white;
+}
+
+.animation-pause {
+  animation-play-state: paused;
+}
+
+.transition-finished {
+  background-color: white;
+}

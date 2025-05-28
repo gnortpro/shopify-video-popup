@@ -1,0 +1,9 @@
+.next
+node_modules/
+yarn.lock
+package.json
+i18n.js
+tsconfig.json
+public
+locales
+postcss.config.js
