@@ -21,24 +21,24 @@
     }
   }
 
-  @media (min-width: 640px) {
-    .swiper {
-      padding: 0 16px;
+  @keyframes slideInUp {
+    0% {
+      transform: translateY(100%);
+      opacity: 0;
     }
 
-    .swiper-button-prev {
-      left: -8px;
-    }
-
-    .swiper-button-next {
-      right: -8px;
-    }
-
-    .swiper-pagination {
-      display: none;
+    100% {
+      transform: translateY(0);
+      opacity: 1;
     }
   }
+
 }
+
+.animate-slideInUp {
+  animation: slideInUp 0.2s ease-in-out;
+}
+
 
 .story-hover-transition {
   animation: storyHoverTransition 5s linear;

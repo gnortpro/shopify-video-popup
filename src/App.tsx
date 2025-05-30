@@ -54,20 +54,24 @@ const App: React.FC = () => {
           className="block outline-0"
           ariaHideApp={false}
         >
-          <button
-            onClick={onHideModal}
-            className={cx(
-              "absolute cursor-pointer z-10 top-4 bg-gray-200 hover:bg-gray-300 rounded-full  flex items-center justify-center transition-colors duration-200",
-              {
-                "w-8 h-8 right-4 ": !isMobile,
-                "w-6 h-6 left-4 text-white": isMobile,
-              },
-            )}
-          >
-            <X size={16} className="text-gray-600" />
-          </button>
+          {!isMobile && (
+            <button
+              onClick={onHideModal}
+              className={cx(
+                "absolute cursor-pointer z-10 top-4 bg-gray-200 hover:bg-gray-300 rounded-full  flex items-center justify-center transition-colors duration-200",
+                {
+                  "w-8 h-8 right-4 ": !isMobile,
+                  "w-6 h-6 left-4 text-white": isMobile,
+                },
+              )}
+            >
+              <X size={16} className="text-gray-600" />
+            </button>
+          )}
+
           {isMobile ? (
             <MobileApp
+              onHideModal={onHideModal}
               videos={videos}
               onVideoChange={handleVideoChange}
               currentVideoItem={currentVideoItem}

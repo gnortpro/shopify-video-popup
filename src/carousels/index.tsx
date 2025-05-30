@@ -1,12 +1,13 @@
-import React, { useState, type FC } from "react";
+import React, { useEffect, useRef, useState, type FC } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
+import { Navigation, Virtual } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback } from "react";
 import type { Swiper as SwiperType } from "swiper/types";
 import { SLIDES } from "./const";
+import { VideoSlideItem } from "./carouselItem";
 
 interface IProps {
   onSlideClick: (slideId: number) => void;
@@ -32,7 +33,7 @@ export const VideoSlider: FC<IProps> = ({ onSlideClick }) => {
     <div className="w-full max-w-4xl mx-auto">
       <div className="relative">
         <Swiper
-          modules={[Navigation]}
+          modules={[Virtual, Navigation]}
           spaceBetween={20}
           slidesPerView={1.2}
           centeredSlides={false}
@@ -41,7 +42,6 @@ export const VideoSlider: FC<IProps> = ({ onSlideClick }) => {
             nextEl: ".swiper-button-next-custom",
           }}
           onSlideChange={handleSlideChange}
-          onSwiper={handleSlideChange}
           breakpoints={{
             640: {
               slidesPerView: 1.5,
@@ -53,47 +53,14 @@ export const VideoSlider: FC<IProps> = ({ onSlideClick }) => {
               slidesPerView: 2.2,
             },
           }}
+          virtual
         >
-          {SLIDES.map((slide) => (
-            <SwiperSlide key={slide.id}>
-              <div
-                className="relative w-full h-[500px] rounded-3xl overflow-hidden shadow-2xl group cursor-pointer transform transition-all duration-300"
+          {SLIDES.map((slide, index) => (
+            <SwiperSlide key={slide.id} virtualIndex={index}>
+              <VideoSlideItem
+                slide={slide}
                 onClick={handleSlideClick(slide.id)}
-              >
-                <div
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{
-                    backgroundImage: `url(${slide.image})`,
-                  }}
-                />
-
-                <div className="absolute inset-0 bg-black opacity-20" />
-
-                <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/60 to-transparent" />
-
-                <div className="relative h-full flex flex-col justify-between p-6 text-white">
-                  <div className="text-center">
-                    <h2 className="text-lg font-bold tracking-wider drop-shadow-lg">
-                      {slide.title}
-                    </h2>
-                  </div>
-
-                  <div className="flex justify-center items-center">
-                    <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg transform transition-all duration-300 group-hover:scale-110">
-                      <Play className="w-8 h-8 text-white ml-1" fill="white" />
-                    </div>
-                  </div>
-
-                  <div className="text-center">
-                    <h3 className="text-xl font-semibold drop-shadow-lg">
-                      {slide.subtitle}
-                    </h3>
-                  </div>
-                </div>
-
-                <div className="absolute inset-0 bg-black opacity-10 transition-opacity duration-300" />
-              </div>
+              />
             </SwiperSlide>
           ))}
         </Swiper>

@@ -41,7 +41,7 @@ export const videos: Video[] = [
     likes: 8,
     isLiked: false,
     duration: 45,
-    videoUrl: "/1.mp4",
+    videoUrl: "/2.mp4",
     thumbnail: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
     products: [
       {
@@ -52,7 +52,7 @@ export const videos: Video[] = [
         discount: "44%",
         rating: 4.9,
         sold: "5,3K",
-        image: "/api/placeholder/80/80",
+        image: "https://placehold.co/120x120",
         tags: ["Content Xtra", "Video Voucher", "Giảm 15%", "COD"],
         favorite: true
       },
@@ -64,10 +64,10 @@ export const videos: Video[] = [
         discount: "30%",
         rating: 5,
         sold: "10K+",
-        image: "/api/placeholder/80/80",
+        image: "https://placehold.co/120x120",
         tags: ["Rẻ Vô Địch", "Content Xtra", "Video Voucher", "Giảm 15%"],
         favorite: true
-      }
+      },
     ]
   },
   {
@@ -82,7 +82,7 @@ export const videos: Video[] = [
     likes: 156,
     isLiked: false,
     duration: 60,
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    videoUrl: "/2.mp4",
     thumbnail: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg",
     products: [
       {
@@ -93,7 +93,7 @@ export const videos: Video[] = [
         discount: "25%",
         rating: 4.8,
         sold: "2,1K",
-        image: "/api/placeholder/80/80",
+        image: "https://placehold.co/120x120",
         tags: ["Giảm 25%", "Trả góp 0%"],
         favorite: false
       }
@@ -122,7 +122,7 @@ export const videos: Video[] = [
         discount: "14%",
         rating: 4.9,
         sold: "856",
-        image: "/api/placeholder/80/80",
+        image: "https://placehold.co/120x120",
         tags: ["Trả góp 0%", "Chính hãng"],
         favorite: true
       }

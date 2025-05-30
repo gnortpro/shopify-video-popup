@@ -1,19 +1,21 @@
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, ShoppingCart, X } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { Video } from "../data/videoData";
 import { ProductModal } from "./ProductModal";
 import { VideoPlayer } from "./VideoPlayer";
-
+import cx from "classnames";
 interface MobileAppProps {
   videos: Video[];
   onVideoChange?: (video: Video) => void;
   currentVideoItem: Video;
+  onHideModal: () => void;
 }
 
 export const MobileApp: React.FC<MobileAppProps> = ({
   videos,
   currentVideoItem,
   onVideoChange,
+  onHideModal,
 }) => {
   const [currentVideoIndex, setCurrentVideoIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
@@ -100,8 +102,6 @@ export const MobileApp: React.FC<MobileAppProps> = ({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent): void => {
-      if (showProductModal) return;
-
       if (e.key === "ArrowUp") {
         e.preventDefault();
         handlePrevVideo();
@@ -112,8 +112,6 @@ export const MobileApp: React.FC<MobileAppProps> = ({
     };
 
     const handleWheel = (e: WheelEvent): void => {
-      if (showProductModal) return;
-
       e.preventDefault();
       const delta = e.deltaY;
 
@@ -172,6 +170,7 @@ export const MobileApp: React.FC<MobileAppProps> = ({
           formatTime={formatTime}
           isMobile={true}
           onProgressUpdate={handleProgressUpdate}
+          onHideModal={onHideModal}
         />
       </div>
       {/* <div className="absolute right-4 top-1/2 -translate-y-1/2 space-y-6 z-30">
@@ -216,13 +215,18 @@ export const MobileApp: React.FC<MobileAppProps> = ({
           <span className="text-white text-xs">Next</span>
         </div>
       </div> */}
-      <div className="absolute top-4 right-4 z-40">
+
+      {/* <div
+        className={cx("absolute top-4 right-4 z-40 flex", {
+          "gap-2": currentVideoItem.productCount > 0,
+        })}
+      >
         <button
           onClick={handleShoppingBagClick}
           className="relative w-12 h-12 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
           title={`${currentVideoItem.discount} - Xem sản phẩm (${currentVideoItem.productCount})`}
         >
-          <ShoppingBag className="w-6 h-6 text-orange-500" />
+          <ShoppingCart className="w-6 h-6 text-orange-500" />
           {currentVideoItem.productCount > 0 && (
             <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">
@@ -231,23 +235,27 @@ export const MobileApp: React.FC<MobileAppProps> = ({
             </div>
           )}
         </button>
-      </div>
-      <div className="absolute bottom-8 left-4 right-20 text-white z-30">
-        <div className="text-sm opacity-90 mb-1 animate-slideInUp animation-delay-200">
-          {currentVideoItem.title}
-        </div>
-        <div className="text-sm text-blue-300 animate-slideInUp animation-delay-300">
-          {currentVideoItem.hashtags}{" "}
-          <span className="text-white">Xem thêm</span>
-        </div>
-      </div>
+        <button
+          onClick={onHideModal}
+          className={cx(
+            "w-6 h-6 text-white cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-full  flex items-center justify-center transition-colors duration-200",
+            {
+              "mt-3": currentVideoItem.productCount > 0,
+            },
+          )}
+        >
+          <X size={16} className="text-gray-600" />
+        </button>
+      </div> */}
 
+      <div className="absolute bottom-8 left-4 right-20 text-white z-30"></div>
+{/* 
       <ProductModal
         isOpen={showProductModal}
         onClose={handleProductModalClose}
         video={currentVideoItem}
-        isMobile={true}
-      />
+        isMobile
+      /> */}
     </div>
   ) : (
     <></>

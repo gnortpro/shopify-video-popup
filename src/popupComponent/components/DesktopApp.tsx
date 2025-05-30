@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import type { Video } from "../data/videoData";
-import { ProductModal } from "./ProductModal";
 import { VideoPlayer } from "./VideoPlayer";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 
@@ -19,7 +18,6 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
-  const [showProductModal, setShowProductModal] = useState<boolean>(false);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [slideDirection, setSlideDirection] = useState<"up" | "down" | null>(
     null,
@@ -81,17 +79,8 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({
     setProgress(newProgress);
   }, []);
 
-  const handleProductModal = useCallback((): void => {
-    setShowProductModal(true);
-  }, []);
-
-  const hideProductModal = useCallback((): void => {
-    setShowProductModal(false);
-  }, []);
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent): void => {
-      if (showProductModal) return;
       if (e.key === "ArrowUp") {
         e.preventDefault();
         handlePrevVideo();
@@ -102,7 +91,6 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({
     };
 
     const handleWheel = (e: WheelEvent): void => {
-      if (showProductModal) return;
       e.preventDefault();
       const delta = e.deltaY;
       if (delta > 0) {
@@ -119,7 +107,7 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("wheel", handleWheel);
     };
-  }, [showProductModal, handlePrevVideo, handleNextVideo]);
+  }, [handlePrevVideo, handleNextVideo]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -162,33 +150,24 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({
             onNextVideo={handleNextVideo}
             formatTime={formatTime}
             isMobile={false}
-            showProductModal={handleProductModal}
             onProgressUpdate={handleProgressUpdate}
           />
           <div className="absolute -right-20 top-1/2 -translate-y-1/2 flex flex-col gap-4">
             <button
               onClick={handlePrevVideo}
               className="w-14 h-14 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
-              title="Video trước"
             >
               <ChevronUpIcon />
             </button>
             <button
               onClick={handleNextVideo}
               className="w-14 h-14 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
-              title="Video sau"
             >
               <ChevronDownIcon />
             </button>
           </div>
         </div>
       </div>
-      <ProductModal
-        isOpen={showProductModal}
-        onClose={hideProductModal}
-        video={currentVideoItem}
-        isMobile={false}
-      />
     </div>
   );
 };
