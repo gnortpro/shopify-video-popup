@@ -1,10 +1,12 @@
 import cx from "classnames";
 import { useCallback, useState, type FC } from "react";
-import type { Story, StoryItemProps } from "./types";
+import type { IStory, IStoryItemProps } from "./types";
 
-export const StoryAvatar: FC<{
-  story: Story;
-}> = ({ story }) => {
+interface IStoryAvatarProps {
+  story: IStory;
+}
+
+export const StoryAvatar: FC<IStoryAvatarProps> = ({ story }) => {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
   const isVideo = story.mediaType === "video" && story.videoUrl;
@@ -21,21 +23,23 @@ export const StoryAvatar: FC<{
   return (
     <div className="relative">
       <div
-        className={cx(
-          "w-14 h-14 sm:w-16 sm:h-16 rounded-full p-0.5 bg-gray-300",
-          {
-            "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500":
-              story.hasNewStory,
-          },
-        )}
+        className={cx("w-14 h-14 sm:w-16 sm:h-16 rounded-full p-0.5", {
+          "bg-gray-300": !story.hasNewStory,
+          "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500":
+            story.hasNewStory,
+        })}
       >
         <div className="w-full h-full bg-white rounded-full p-0.5 relative overflow-hidden">
           <img
             src={story.thumbnailUrl || story.avatar}
             alt={story.username}
-            className={`w-full h-full object-cover rounded-full transition-opacity duration-300 ${
-              isVideoLoaded ? "opacity-0" : "opacity-100"
-            }`}
+            className={cx(
+              "w-full h-full object-cover rounded-full transition-opacity duration-300",
+              {
+                "opacity-0": isVideoLoaded,
+                "opacity-100": !isVideoLoaded,
+              },
+            )}
             draggable={false}
             loading="lazy"
           />
@@ -44,7 +48,10 @@ export const StoryAvatar: FC<{
               src={story.videoUrl}
               className={cx(
                 "absolute inset-0 w-full h-full object-cover rounded-full transition-opacity duration-300",
-                isVideoLoaded ? "opacity-100" : "opacity-0",
+                {
+                  "opacity-100": isVideoLoaded,
+                  "opacity-0": !isVideoLoaded,
+                },
               )}
               muted
               loop
@@ -60,7 +67,7 @@ export const StoryAvatar: FC<{
   );
 };
 
-export const StoryItem: FC<StoryItemProps> = ({ story, onClick }) => {
+export const StoryItem: FC<IStoryItemProps> = ({ story, onClick }) => {
   const handleClick = useCallback(
     (e: React.MouseEvent): void => {
       e.preventDefault();

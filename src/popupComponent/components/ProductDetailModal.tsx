@@ -1,16 +1,22 @@
 import { ShoppingCart, X } from "lucide-react";
-import React, { useCallback, useRef, useEffect, useState } from "react";
-import type { Product } from "../data/videoData";
+import React, {
+  useCallback,
+  useRef,
+  useEffect,
+  useState,
+  type FC,
+} from "react";
 import cx from "classnames";
+import type { IProduct } from "../data/videoData";
 
-interface ProductDetailModalProps {
+interface IProductDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  product: Product;
+  product: IProduct;
   isMobile?: boolean;
 }
 
-export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
+export const ProductDetailModal: FC<IProductDetailModalProps> = ({
   isOpen,
   onClose,
   product,
@@ -46,13 +52,10 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
       console.log("Scroll position:", scrollTop);
 
-      // Khi user scroll xuống (scroll > 50px), chuyển sang full screen
       if (scrollTop > 50 && !isFullScreen) {
         setIsFullScreen(true);
         console.log("Switching to full screen");
-      }
-      // Khi user scroll về đầu (scroll <= 20px), quay về 90vh
-      else if (scrollTop <= 20 && isFullScreen) {
+      } else if (scrollTop <= 20 && isFullScreen) {
         setIsFullScreen(false);
         console.log("Switching back to 90vh");
       }
@@ -60,7 +63,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     [isFullScreen],
   );
 
-  // Reset full screen state khi modal đóng/mở
   useEffect(() => {
     if (isOpen) {
       setIsFullScreen(false);
@@ -78,20 +80,27 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         />
       )}
       <div
-        className={`fixed left-0 w-full z-100 flex items-end justify-center transition-all duration-300 ease-out ${
-          isFullScreen
-            ? "top-0 h-screen"
-            : isMobile
-              ? "bottom-0 h-[90vh] animation-slideInUp"
-              : "bottom-0 h-[90%] animation-slideInUp"
-        }`}
+        className={cx(
+          "fixed left-0 w-full z-100 flex items-end justify-center transition-all duration-300 ease-out",
+          {
+            "top-0 h-screen": isFullScreen,
+            "bottom-0 h-[90vh] animation-slideInUp": !isFullScreen && isMobile,
+            "bottom-0 h-[90%] animation-slideInUp": !isFullScreen && !isMobile,
+          },
+        )}
         onClick={handleOverlayClick}
       >
         <div
           className={cx(
             "bg-white w-full transition-all duration-300 ease-out",
-            isFullScreen ? "h-full rounded-none" : "h-full rounded-t-xl",
-            isMobile ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden",
+            {
+              "h-full rounded-none": isFullScreen,
+              "h-full rounded-t-xl": !isFullScreen,
+            },
+            {
+              "overflow-y-auto overflow-x-hidden": isMobile,
+              "overflow-hidden": !isMobile,
+            },
           )}
           ref={wrapperRef}
           onScroll={handleScroll}
@@ -113,7 +122,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <X className="text-gray-400 w-5 h-5" />
             </button>
 
-            {/* Indicator bar - chỉ hiện khi không full screen */}
             {!isFullScreen && (
               <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
                 <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
@@ -126,22 +134,24 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               "max-h-[80%] overflow-y-auto": !isMobile,
             })}
           >
-            {/* Price Section */}
             <div className="mb-3">
               <div className="flex items-center space-x-2 mb-1">
                 <span className="text-2xl font-bold text-orange-500">
                   ₫{product.price}
                 </span>
-                <span className="text-sm text-gray-400 line-through">
-                  ₫{product.originalPrice}
-                </span>
-                <span className="bg-orange-500 text-white px-1 py-0.5 rounded text-xs font-medium">
-                  -{product.discount}
-                </span>
+                {product.originalPrice && (
+                  <span className="text-sm text-gray-400 line-through">
+                    ₫{product.originalPrice}
+                  </span>
+                )}
+                {product.discount && (
+                  <span className="bg-orange-500 text-white px-1 py-0.5 rounded text-xs font-medium">
+                    -{product.discount}
+                  </span>
+                )}
               </div>
             </div>
 
-            {/* Product Name */}
             <h1 className="text-lg font-medium text-gray-800 mb-3 leading-tight">
               {product.name}
             </h1>
@@ -261,7 +271,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             </div>
           </div>
 
-          {/* Fixed Buy Button */}
           <div className="fixed bottom-4 left-4 right-4 mx-auto max-w-sm">
             <div className="bg-orange-500 rounded-lg p-3 shadow-lg">
               <button

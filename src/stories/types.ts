@@ -1,4 +1,6 @@
-export interface Story {
+export type IMediaType = "image" | "video";
+
+export interface IStory {
   id: number;
   username: string;
   avatar: string;
@@ -8,14 +10,12 @@ export interface Story {
   hasNewStory?: boolean;
 }
 
-export interface StoryItemProps {
-  story: Story;
-  onClick: (story: Story) => void;
+export interface IStoryItemProps {
+  story: IStory;
+  onClick: (story: IStory) => void;
 }
 
-export interface StoriesCarouselProps {
-  stories?: Story[];
+export interface IStoriesCarouselProps {
+  stories?: IStory[];
   onStoryClick?: (id: number) => void;
 }
-
-export type IMediaType = "image" | "video";

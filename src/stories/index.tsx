@@ -1,13 +1,13 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, type FC } from "react";
 import type { Swiper as SwiperType } from "swiper";
 import { Navigation, Virtual } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { STORIES, swiperBreakpoints } from "./consts";
+import { STORIES, SWIPER_BREAKPOINTS } from "./consts";
 import { CustomNavigationButton } from "./navigation";
 import { StoryItem } from "./storyItem";
-import type { StoriesCarouselProps, Story } from "./types";
+import type { IStoriesCarouselProps, IStory } from "./types";
 
-export const VideoStories: React.FC<StoriesCarouselProps> = ({
+export const VideoStories: FC<IStoriesCarouselProps> = ({
   stories = STORIES,
   onStoryClick,
 }) => {
@@ -16,7 +16,7 @@ export const VideoStories: React.FC<StoriesCarouselProps> = ({
   const [isEnd, setIsEnd] = React.useState(false);
 
   const handleStoryClick = useCallback(
-    (story: Story): void => {
+    (story: IStory): void => {
       console.log("Story clicked:", story.username);
       onStoryClick?.(story.id);
     },
@@ -60,7 +60,7 @@ export const VideoStories: React.FC<StoriesCarouselProps> = ({
           modules={[Navigation, Virtual]}
           slidesPerView="auto"
           spaceBetween={0}
-          breakpoints={swiperBreakpoints}
+          breakpoints={SWIPER_BREAKPOINTS}
           grabCursor={true}
           normalizeSlideIndex={false}
           preventClicks={false}

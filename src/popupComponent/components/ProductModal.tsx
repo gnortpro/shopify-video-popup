@@ -1,16 +1,17 @@
-import React, { useCallback } from "react";
+import React, { useCallback, type FC } from "react";
 import { X } from "lucide-react";
 import { ProductItem } from "./ProductItem";
-import type { Video, Product } from "../data/videoData";
-interface ProductModalProps {
+import type { IVideo, IProduct } from "../data/videoData";
+
+interface IProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   openProductDetailModal: () => void;
-  video: Video | null;
+  video: IVideo | null;
   isMobile?: boolean;
 }
 
-export const ProductModal: React.FC<ProductModalProps> = ({
+export const ProductModal: FC<IProductModalProps> = ({
   isOpen,
   onClose,
   video,
@@ -48,7 +49,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       <div className="bg-white rounded-t-xl w-full max-h-[80vh] overflow-hidden animate-slideInUp">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <h3 className="text-lg font-semibold text-gray-900">
-            Sản phẩm trong video ({video.productCount})
+            Sản phẩm trong video ({video.products.length})
           </h3>
           <button
             onClick={handleCloseClick}
@@ -58,7 +59,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           </button>
         </div>
         <div className="p-6 overflow-y-auto max-h-[calc(80vh-100px)]">
-          {video.products?.map((product: Product) => (
+          {video.products?.map((product: IProduct) => (
             <ProductItem
               key={product.id}
               product={product}

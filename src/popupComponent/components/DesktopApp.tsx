@@ -1,15 +1,16 @@
-import React, { useCallback, useEffect, useState } from "react";
-import type { Video } from "../data/videoData";
-import { VideoPlayer } from "./VideoPlayer";
+import React, { useCallback, useEffect, useState, type FC } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import cx from "classnames";
+import type { IVideo } from "../data/videoData";
+import { VideoPlayer } from "./VideoPlayer";
 
-interface DesktopAppProps {
-  videos: Video[];
-  currentVideoItem: Video;
-  onVideoChange?: (currentVideoItem: Video) => void;
+interface IDesktopAppProps {
+  videos: IVideo[];
+  currentVideoItem: IVideo;
+  onVideoChange?: (currentVideoItem: IVideo) => void;
 }
 
-export const DesktopApp: React.FC<DesktopAppProps> = ({
+export const DesktopApp: FC<IDesktopAppProps> = ({
   videos,
   onVideoChange,
   currentVideoItem,
@@ -128,13 +129,13 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({
     <div className="min-h-screen bg-black text-white flex justify-center items-center relative">
       <div className="relative">
         <div
-          className={`transition-transform duration-300 ease-out ${
-            isTransitioning
-              ? slideDirection === "up"
-                ? "-translate-y-4 opacity-50"
-                : "translate-y-4 opacity-50"
-              : "translate-y-0 opacity-100"
-          }`}
+          className={cx("transition-transform duration-300 ease-out", {
+            "-translate-y-4 opacity-50":
+              isTransitioning && slideDirection === "up",
+            "translate-y-4 opacity-50":
+              isTransitioning && slideDirection === "down",
+            "translate-y-0 opacity-100": !isTransitioning,
+          })}
         >
           <VideoPlayer
             video={currentVideoItem}

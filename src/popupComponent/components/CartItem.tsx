@@ -1,17 +1,19 @@
-import React, { useCallback, useState, type ChangeEvent } from "react";
+import React, { useCallback, useState, type ChangeEvent, type FC } from "react";
 import { Minus, Plus, ShoppingBag } from "lucide-react";
-import type { Product } from "../data/videoData";
+import cx from "classnames";
+import type { IProduct } from "../data/videoData";
 
-interface CartItemProps {
-  product: Product;
+interface ICartItemProps {
+  product: IProduct;
   isMobile?: boolean;
   onOpenProductDetailModal: () => void;
   onBuyNow?: (productId: number) => void;
 }
 
-export const CartItem: React.FC<CartItemProps> = React.memo(
+export const CartItem: FC<ICartItemProps> = React.memo(
   ({ product, isMobile = false, onBuyNow, onOpenProductDetailModal }) => {
     const [quantity, setQuantity] = useState(0);
+
     const handleProductBuyClick = useCallback((): void => {
       onBuyNow?.(product.id);
     }, [product.id, onBuyNow]);
@@ -40,52 +42,57 @@ export const CartItem: React.FC<CartItemProps> = React.memo(
 
     return (
       <div
-        className={`bg-white w-full border border-gray-100 rounded-lg p-3 mb-3 shadow-sm hover:bg-gray-50 transition-colors ${
-          !isMobile ? "bg-gray-50 p-4 mb-4" : ""
-        }`}
+        className={cx(
+          "bg-white w-full border border-gray-100 rounded-lg p-3 mb-3 shadow-sm hover:bg-gray-50 transition-colors",
+          {
+            "bg-gray-50 p-4 mb-4": !isMobile,
+          },
+        )}
       >
         <div className="flex gap-3">
           <div className="relative flex-shrink-0 m-auto">
             <div
-              className={`bg-gray-200 rounded-lg flex items-center justify-center ${
-                isMobile ? "w-20 h-20" : "w-24 h-24"
-              }`}
+              className={cx(
+                "bg-gray-200 rounded-lg flex items-center justify-center",
+                {
+                  "w-20 h-20": isMobile,
+                  "w-24 h-24": !isMobile,
+                },
+              )}
             >
               <ShoppingBag
-                className={`text-gray-400 ${isMobile ? "w-8 h-8" : "w-10 h-10"}`}
+                className={cx("text-gray-400", {
+                  "w-8 h-8": isMobile,
+                  "w-10 h-10": !isMobile,
+                })}
               />
             </div>
-            {product.favorite && (
-              <div
-                className={`absolute bg-red-500 text-white text-xs px-1 rounded ${
-                  isMobile ? "-top-1 -left-1" : "-top-2 -left-2 px-2 py-1"
-                }`}
-              >
-                Yêu thích
-              </div>
-            )}
           </div>
           <div className="flex-1 min-w-0">
             <h4
               onClick={openProductDetailModal}
-              className={`font-medium text-gray-900 mb-2 cursor-pointer ${
-                isMobile ? "text-sm leading-tight" : "text-base mb-3"
-              }`}
+              className={cx("font-medium text-gray-900 mb-2 cursor-pointer", {
+                "text-sm leading-tight": isMobile,
+                "text-base mb-3": !isMobile,
+              })}
             >
               <span className="line-clamp-2">{product.name}</span>
             </h4>
             <div
-              className={`flex items-center justify-between ${isMobile ? "flex-col items-start gap-2" : ""}`}
+              className={cx("flex items-center justify-between", {
+                "flex-col items-start gap-2": isMobile,
+              })}
             >
               <div
-                className={`flex items-center gap-2 flex-wrap ${
-                  !isMobile ? "gap-3" : ""
-                }`}
+                className={cx("flex items-center gap-2 flex-wrap", {
+                  "gap-3": !isMobile,
+                })}
               >
                 <span
-                  className={`font-bold text-red-600 whitespace-nowrap ${
-                    isMobile ? "text-lg" : "text-xl"
-                  }`}
+                  className={cx("font-bold text-red-600 whitespace-nowrap", {
+                    "text-lg": isMobile,
+                    "text-xl": !isMobile,
+                  })}
                 >
                   ₫{product.price}
                 </span>
@@ -108,11 +115,14 @@ export const CartItem: React.FC<CartItemProps> = React.memo(
                 <button
                   onClick={decreaseQuantity}
                   disabled={quantity <= 1}
-                  className={`w-8 h-8 flex items-center justify-center transition-all duration-200 cursor-pointer ${
-                    quantity <= 1
-                      ? " text-gray-400 cursor-not-allowed"
-                      : "text-gray-600 hover:bg-orange-50 hover:text-orange-500 active:bg-orange-100"
-                  }`}
+                  className={cx(
+                    "w-8 h-8 flex items-center justify-center transition-all duration-200 cursor-pointer",
+                    {
+                      "text-gray-400 cursor-not-allowed": quantity <= 1,
+                      "text-gray-600 hover:bg-orange-50 hover:text-orange-500 active:bg-orange-100":
+                        quantity > 1,
+                    },
+                  )}
                 >
                   <Minus className="w-4 h-4" />
                 </button>

@@ -1,48 +1,32 @@
-export interface Product {
+export interface IProduct {
   id: number;
   name: string;
   price: string;
   originalPrice?: string;
   discount?: string;
-  rating: number;
-  sold: string;
   image: string;
-  tags: string[];
-  favorite: boolean;
 }
 
-export interface Video {
+export interface IVideo {
   id: number;
   title: string;
-  username: string;
-  hashtags: string;
-  discount: string;
-  productCount: number;
-  views: string;
-  comments: number;
-  likes: number;
-  isLiked: boolean;
   duration: number;
   videoUrl: string;
   thumbnail?: string;
-  products: Product[];
+  products: IProduct[];
 }
 
-export const videos: Video[] = [
+const SAMPLE_PRODUCT_IMAGE = "https://placehold.co/120x120";
+
+export const videos: IVideo[] = [
   {
     id: 1,
     title: "Hướng dẫn phân biệt pin Maxell hàng thật-giả",
-    username: "@Hồng Ngọc Review",
-    hashtags: "#VideohangDoiSong #VideoReview #PinMaxell",
-    discount: "Giảm 15%",
-    productCount: 2,
-    views: "2.3K",
-    comments: 0,
-    likes: 8,
-    isLiked: false,
     duration: 45,
-    videoUrl: "/2.mp4",
-    thumbnail: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+    videoUrl:
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    thumbnail:
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
     products: [
       {
         id: 1,
@@ -50,11 +34,7 @@ export const videos: Video[] = [
         price: "114.954",
         originalPrice: "209.000",
         discount: "44%",
-        rating: 4.9,
-        sold: "5,3K",
-        image: "https://placehold.co/120x120",
-        tags: ["Content Xtra", "Video Voucher", "Giảm 15%", "COD"],
-        favorite: true
+        image: SAMPLE_PRODUCT_IMAGE,
       },
       {
         id: 2,
@@ -62,28 +42,18 @@ export const videos: Video[] = [
         price: "14.000",
         originalPrice: "20.000",
         discount: "30%",
-        rating: 5,
-        sold: "10K+",
-        image: "https://placehold.co/120x120",
-        tags: ["Rẻ Vô Địch", "Content Xtra", "Video Voucher", "Giảm 15%"],
-        favorite: true
+        image: SAMPLE_PRODUCT_IMAGE,
       },
-    ]
+    ],
   },
   {
     id: 2,
     title: "Top 5 smartphone giá rẻ tốt nhất 2024",
-    username: "@Tech Review VN",
-    hashtags: "#Smartphone #TechReview #GiaRe",
-    discount: "Giảm 25%",
-    productCount: 5,
-    views: "15.2K",
-    comments: 23,
-    likes: 156,
-    isLiked: false,
     duration: 60,
-    videoUrl: "/2.mp4",
-    thumbnail: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg",
+    videoUrl:
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    thumbnail:
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg",
     products: [
       {
         id: 3,
@@ -91,28 +61,18 @@ export const videos: Video[] = [
         price: "5.990.000",
         originalPrice: "7.990.000",
         discount: "25%",
-        rating: 4.8,
-        sold: "2,1K",
-        image: "https://placehold.co/120x120",
-        tags: ["Giảm 25%", "Trả góp 0%"],
-        favorite: false
-      }
-    ]
+        image: SAMPLE_PRODUCT_IMAGE,
+      },
+    ],
   },
   {
     id: 3,
     title: "Unboxing iPhone 15 Pro Max chính hãng",
-    username: "@Apple Việt Nam",
-    hashtags: "#iPhone15ProMax #Unboxing #Apple",
-    discount: "Trả góp 0%",
-    productCount: 1,
-    views: "89.5K",
-    comments: 342,
-    likes: 1240,
-    isLiked: true,
     duration: 120,
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    thumbnail: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg",
+    videoUrl:
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    thumbnail:
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg",
     products: [
       {
         id: 4,
@@ -120,12 +80,8 @@ export const videos: Video[] = [
         price: "29.990.000",
         originalPrice: "34.990.000",
         discount: "14%",
-        rating: 4.9,
-        sold: "856",
-        image: "https://placehold.co/120x120",
-        tags: ["Trả góp 0%", "Chính hãng"],
-        favorite: true
-      }
-    ]
-  }
+        image: SAMPLE_PRODUCT_IMAGE,
+      },
+    ],
+  },
 ];

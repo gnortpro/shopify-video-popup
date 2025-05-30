@@ -1,17 +1,17 @@
-import React, { useCallback } from "react";
+import React, { useCallback, type FC } from "react";
 import { X } from "lucide-react";
-import type { Video, Product } from "../data/videoData";
+import type { IVideo, IProduct } from "../data/videoData";
 import { CartItem } from "./CartItem";
 
-interface CartModalProps {
+interface ICartModalProps {
   isOpen: boolean;
   onClose: () => void;
-  video: Video | null;
+  video: IVideo | null;
   isMobile?: boolean;
   onOpenProductDetailModal: () => void;
 }
 
-export const CartModal: React.FC<CartModalProps> = ({
+export const CartModal: FC<ICartModalProps> = ({
   isOpen,
   onClose,
   video,
@@ -45,7 +45,7 @@ export const CartModal: React.FC<CartModalProps> = ({
       <div className="bg-white rounded-t-xl w-full max-h-[80vh] overflow-hidden animate-slideInUp">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <h3 className="text-lg font-semibold text-gray-900">
-            Giỏ hàng ({video.productCount})
+            Giỏ hàng ({video.products.length})
           </h3>
           <button
             onClick={handleCloseClick}
@@ -55,7 +55,7 @@ export const CartModal: React.FC<CartModalProps> = ({
           </button>
         </div>
         <div className="p-6 overflow-y-auto max-h-[calc(80vh-100px)]">
-          {video.products?.map((product: Product) => (
+          {video.products?.map((product: IProduct) => (
             <CartItem
               key={product.id}
               product={product}

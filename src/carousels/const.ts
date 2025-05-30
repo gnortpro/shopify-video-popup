@@ -1,4 +1,15 @@
-export const SLIDES = [
+export interface ISlide {
+  id: number;
+  title: string;
+  subtitle: string;
+  image?: string;
+  gradient?: string;
+  videoUrl?: string;
+  mediaType: "image" | "video";
+  thumbnailUrl?: string;
+}
+
+export const SLIDES: ISlide[] = [
   {
     id: 1,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
@@ -11,31 +22,25 @@ export const SLIDES = [
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Những lưu ý khi",
     gradient: "from-red-400 via-pink-400 to-blue-400",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 3,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Kinh nghiệm du học",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 4,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Tìm việc làm hiệu quả",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 5,
@@ -49,31 +54,25 @@ export const SLIDES = [
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Những lưu ý khi",
     gradient: "from-red-400 via-pink-400 to-blue-400",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 7,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Kinh nghiệm du học",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 8,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Tìm việc làm hiệu quả",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 9,
@@ -87,31 +86,25 @@ export const SLIDES = [
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Những lưu ý khi",
     gradient: "from-red-400 via-pink-400 to-blue-400",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 11,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Kinh nghiệm du học",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 12,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Tìm việc làm hiệu quả",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 13,
@@ -125,31 +118,25 @@ export const SLIDES = [
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Những lưu ý khi",
     gradient: "from-red-400 via-pink-400 to-blue-400",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 15,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Kinh nghiệm du học",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 16,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Tìm việc làm hiệu quả",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 17,
@@ -163,31 +150,25 @@ export const SLIDES = [
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Những lưu ý khi",
     gradient: "from-red-400 via-pink-400 to-blue-400",
-    videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 19,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Kinh nghiệm du học",
-    videoUrl:
-      "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+    videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 20,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Tìm việc làm hiệu quả",
-    videoUrl:
-      "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
+    videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 21,
@@ -201,31 +182,25 @@ export const SLIDES = [
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Những lưu ý khi",
     gradient: "from-red-400 via-pink-400 to-blue-400",
-    videoUrl:
-      "https://file-examples.com/storage/fe9a9edbcbadda6b69e2dc9/2017/10/file_example_MP4_1920_18MG.mp4",
+    videoUrl: "https://file-examples.com/storage/fe9a9edbcbadda6b69e2dc9/2017/10/file_example_MP4_1920_18MG.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 23,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Kinh nghiệm du học",
-    videoUrl:
-      "https://file-examples.com/storage/fe9a9edbcbadda6b69e2dc9/2017/10/file_example_MP4_1280_10MG.mp4",
+    videoUrl: "https://file-examples.com/storage/fe9a9edbcbadda6b69e2dc9/2017/10/file_example_MP4_1280_10MG.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 24,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Tìm việc làm hiệu quả",
-    videoUrl:
-      "https://file-examples.com/storage/fe9a9edbcbadda6b69e2dc9/2017/10/file_example_MP4_640_3MG.mp4",
+    videoUrl: "https://file-examples.com/storage/fe9a9edbcbadda6b69e2dc9/2017/10/file_example_MP4_640_3MG.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 25,
@@ -239,31 +214,25 @@ export const SLIDES = [
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Những lưu ý khi",
     gradient: "from-red-400 via-pink-400 to-blue-400",
-    videoUrl:
-      "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4",
+    videoUrl: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 27,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Kinh nghiệm du học",
-    videoUrl:
-      "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4",
+    videoUrl: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 28,
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Tìm việc làm hiệu quả",
-    videoUrl:
-      "https://test-videos.co.uk/vids/sintel/mp4/h264/360/Sintel_360_10s_1MB.mp4",
+    videoUrl: "https://test-videos.co.uk/vids/sintel/mp4/h264/360/Sintel_360_10s_1MB.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
   {
     id: 29,
@@ -277,10 +246,8 @@ export const SLIDES = [
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Những lưu ý khi",
     gradient: "from-red-400 via-pink-400 to-blue-400",
-    videoUrl:
-      "https://test-videos.co.uk/vids/sintel/mp4/h264/720/Sintel_720_10s_5MB.mp4",
+    videoUrl: "https://test-videos.co.uk/vids/sintel/mp4/h264/720/Sintel_720_10s_5MB.mp4",
     mediaType: "video",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   },
 ];

@@ -1,40 +1,50 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, type FC } from "react";
 import Modal from "react-modal";
-import { MobileApp } from "./popupComponent/components/MobileApp";
-import { videos, type Video } from "./popupComponent/data/videoData";
-import { DesktopApp } from "./popupComponent/components/DesktopApp";
-import { VideoStories } from "./stories";
 import { X } from "lucide-react";
 import cx from "classnames";
+import { MobileApp } from "./popupComponent/components/MobileApp";
+import { videos, type IVideo } from "./popupComponent/data/videoData";
+import { DesktopApp } from "./popupComponent/components/DesktopApp";
+import { VideoStories } from "./stories";
 import { VideoSlider } from "./carousels";
 import { VideoPopup } from "./popup";
 
-const App: React.FC = () => {
+const App: FC = () => {
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
-  const [currentVideoItem, setCurrentVideoItem] = useState<Video | undefined>();
+  const [currentVideoItem, setCurrentVideoItem] = useState<
+    IVideo | undefined
+  >();
 
-  useEffect(() => {
-    const handleResize = (): void => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+  const handleResize = useCallback((): void => {
+    setIsMobile(window.innerWidth < 768);
   }, []);
 
-  const handleVideoChange = (video: Video) => {
-    setCurrentVideoItem(video);
-  };
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [handleResize]);
 
-  const handleStoryClick = (id: number) => {
+  const handleVideoChange = useCallback((video: IVideo) => {
+    setCurrentVideoItem(video);
+  }, []);
+
+  const handleStoryClick = useCallback((id: number) => {
     setCurrentVideoItem(
       videos.find((video) => video.id === Number(id)) || videos[0],
     );
-  };
+  }, []);
 
-  const onHideModal = () => {
+  const onHideModal = useCallback(() => {
     setCurrentVideoItem(undefined);
-  };
+  }, []);
+
+  const handleVideoPopupClick = useCallback(() => {
+    handleStoryClick(1);
+  }, [handleStoryClick]);
+
+  const handleCloseModal = useCallback(() => {
+    onHideModal();
+  }, [onHideModal]);
 
   return (
     <div className="">
@@ -44,7 +54,7 @@ const App: React.FC = () => {
       <div className="bg-white overflow-hidden mb-8">
         <VideoSlider onSlideClick={handleStoryClick} />
       </div>
-      <VideoPopup onVideoClick={() => handleStoryClick(1)} />
+      <VideoPopup onVideoClick={handleVideoPopupClick} />
       {currentVideoItem && (
         <Modal
           isOpen
@@ -56,11 +66,11 @@ const App: React.FC = () => {
         >
           {!isMobile && (
             <button
-              onClick={onHideModal}
+              onClick={handleCloseModal}
               className={cx(
-                "absolute cursor-pointer z-10 top-4 bg-gray-200 hover:bg-gray-300 rounded-full  flex items-center justify-center transition-colors duration-200",
+                "absolute cursor-pointer z-10 top-4 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors duration-200",
                 {
-                  "w-8 h-8 right-4 ": !isMobile,
+                  "w-8 h-8 right-4": !isMobile,
                   "w-6 h-6 left-4 text-white": isMobile,
                 },
               )}

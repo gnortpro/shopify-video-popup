@@ -1,6 +1,6 @@
-import type { Story } from "./types";
+import type { IStory } from "./types";
 
-export const STORIES: Story[] = [
+export const STORIES: IStory[] = [
   {
     id: 1,
     username: "dechinap...",
@@ -120,7 +120,7 @@ export const STORIES: Story[] = [
     mediaType: "image",
   },
   {
-     id: 12,
+    id: 12,
     username: "yuanwan_",
     avatar:
       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face",
@@ -133,7 +133,7 @@ export const STORIES: Story[] = [
   },
 ];
 
-export const swiperBreakpoints = {
+export const SWIPER_BREAKPOINTS = {
   320: {
     slidesPerView: 4.5,
   },

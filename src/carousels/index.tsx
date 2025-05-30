@@ -1,19 +1,25 @@
-import React, { useEffect, useRef, useState, type FC } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  type FC,
+} from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Virtual } from "swiper/modules";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { Swiper as SwiperType } from "swiper/types";
+import cx from "classnames";
 import "swiper/css";
 import "swiper/css/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback } from "react";
-import type { Swiper as SwiperType } from "swiper/types";
 import { SLIDES } from "./const";
 import { VideoSlideItem } from "./carouselItem";
 
-interface IProps {
+interface IVideoSliderProps {
   onSlideClick: (slideId: number) => void;
 }
 
-export const VideoSlider: FC<IProps> = ({ onSlideClick }) => {
+export const VideoSlider: FC<IVideoSliderProps> = ({ onSlideClick }) => {
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
 
@@ -66,23 +72,35 @@ export const VideoSlider: FC<IProps> = ({ onSlideClick }) => {
         </Swiper>
 
         <div
-          className={`absolute right-0 top-0 z-10 h-full w-24 transition-all [background:linear-gradient(270deg,white_0%,transparent_100%)] ${
-            isEnd ? "invisible opacity-0" : "visible opacity-100"
-          }`}
+          className={cx(
+            "absolute right-0 top-0 z-10 h-full w-24 transition-all [background:linear-gradient(270deg,white_0%,transparent_100%)]",
+            {
+              "invisible opacity-0": isEnd,
+              "visible opacity-100": !isEnd,
+            },
+          )}
         />
 
         <button
-          className={`swiper-button-prev-custom absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all duration-200 cursor-pointer ${
-            isBeginning ? "opacity-0 pointer-events-none" : "opacity-100"
-          }`}
+          className={cx(
+            "swiper-button-prev-custom absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all duration-200 cursor-pointer",
+            {
+              "opacity-0 pointer-events-none": isBeginning,
+              "opacity-100": !isBeginning,
+            },
+          )}
         >
           <ChevronLeft className="w-6 h-6 text-gray-700" />
         </button>
 
         <button
-          className={`swiper-button-next-custom absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all duration-200 cursor-pointer ${
-            isEnd ? "opacity-0 pointer-events-none" : "opacity-100"
-          }`}
+          className={cx(
+            "swiper-button-next-custom absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all duration-200 cursor-pointer",
+            {
+              "opacity-0 pointer-events-none": isEnd,
+              "opacity-100": !isEnd,
+            },
+          )}
         >
           <ChevronRight className="w-6 h-6 text-gray-700" />
         </button>

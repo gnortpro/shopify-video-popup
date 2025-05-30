@@ -1,17 +1,22 @@
-import { ShoppingBag, ShoppingCart, X } from "lucide-react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import type { Video } from "../data/videoData";
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FC,
+} from "react";
+import type { IVideo } from "../data/videoData";
 import { ProductModal } from "./ProductModal";
 import { VideoPlayer } from "./VideoPlayer";
-import cx from "classnames";
-interface MobileAppProps {
-  videos: Video[];
-  onVideoChange?: (video: Video) => void;
-  currentVideoItem: Video;
+
+interface IMobileAppProps {
+  videos: IVideo[];
+  onVideoChange?: (video: IVideo) => void;
+  currentVideoItem: IVideo;
   onHideModal: () => void;
 }
 
-export const MobileApp: React.FC<MobileAppProps> = ({
+export const MobileApp: FC<IMobileAppProps> = ({
   videos,
   currentVideoItem,
   onVideoChange,
@@ -146,7 +151,9 @@ export const MobileApp: React.FC<MobileAppProps> = ({
     }
   }, [isPlaying, handleNextVideo, currentVideoItem]);
 
-  return currentVideoItem ? (
+  if (!currentVideoItem) return null;
+
+  return (
     <div className="relative w-screen h-screen">
       <div
         ref={containerRef}
@@ -173,91 +180,8 @@ export const MobileApp: React.FC<MobileAppProps> = ({
           onHideModal={onHideModal}
         />
       </div>
-      {/* <div className="absolute right-4 top-1/2 -translate-y-1/2 space-y-6 z-30">
-        <div className="text-center">
-          <button
-            onClick={handleLike}
-            className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-2 transform hover:scale-110 transition-all duration-300 cursor-pointer"
-          >
-            <Heart
-              className={`w-6 h-6 transition-all duration-300 ${
-                currentVideoItem.isLiked
-                  ? "text-red-500 fill-red-500 animate-pulse scale-110"
-                  : "text-white hover:text-red-300"
-              }`}
-            />
-          </button>
-          <span className="text-white text-xs font-semibold">
-            {currentVideoItem.likes}
-          </span>
-        </div>
-        <div className="text-center">
-          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-2 transform hover:scale-110 transition-transform">
-            <MessageCircle className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-white text-xs">
-            {currentVideoItem.comments}
-          </span>
-        </div>
-        <div className="text-center">
-          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-2 transform hover:scale-110 transition-transform">
-            <Share className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-white text-xs">Chia sẻ</span>
-        </div>
-        <div className="text-center">
-          <button
-            onClick={handleNextVideo}
-            className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-2 transform hover:scale-110 transition-transform cursor-pointer"
-          >
-            <RotateCcw className="w-6 h-6 text-white" />
-          </button>
-          <span className="text-white text-xs">Next</span>
-        </div>
-      </div> */}
-
-      {/* <div
-        className={cx("absolute top-4 right-4 z-40 flex", {
-          "gap-2": currentVideoItem.productCount > 0,
-        })}
-      >
-        <button
-          onClick={handleShoppingBagClick}
-          className="relative w-12 h-12 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
-          title={`${currentVideoItem.discount} - Xem sản phẩm (${currentVideoItem.productCount})`}
-        >
-          <ShoppingCart className="w-6 h-6 text-orange-500" />
-          {currentVideoItem.productCount > 0 && (
-            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs font-bold">
-                {currentVideoItem.productCount}
-              </span>
-            </div>
-          )}
-        </button>
-        <button
-          onClick={onHideModal}
-          className={cx(
-            "w-6 h-6 text-white cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-full  flex items-center justify-center transition-colors duration-200",
-            {
-              "mt-3": currentVideoItem.productCount > 0,
-            },
-          )}
-        >
-          <X size={16} className="text-gray-600" />
-        </button>
-      </div> */}
 
       <div className="absolute bottom-8 left-4 right-20 text-white z-30"></div>
-{/* 
-      <ProductModal
-        isOpen={showProductModal}
-        onClose={handleProductModalClose}
-        video={currentVideoItem}
-        isMobile
-      /> */}
     </div>
-  ) : (
-    <></>
   );
 };

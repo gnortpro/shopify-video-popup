@@ -1,15 +1,16 @@
 import { ShoppingBag } from "lucide-react";
-import React, { useCallback } from "react";
-import type { Product } from "../data/videoData";
+import React, { useCallback, type FC } from "react";
+import cx from "classnames";
+import type { IProduct } from "../data/videoData";
 
-interface ProductItemProps {
-  product: Product;
+interface IProductItemProps {
+  product: IProduct;
   isMobile?: boolean;
   onBuyNow?: (productId: number) => void;
   onOpenProductDetailModal: () => void;
 }
 
-export const ProductItem: React.FC<ProductItemProps> = React.memo(
+export const ProductItem: FC<IProductItemProps> = React.memo(
   ({ onOpenProductDetailModal, product, isMobile = false, onBuyNow }) => {
     const handleProductBuyClick = useCallback((): void => {
       onBuyNow?.(product.id);
@@ -21,52 +22,56 @@ export const ProductItem: React.FC<ProductItemProps> = React.memo(
 
     return (
       <div
-        className={`bg-white w-full border border-gray-100 rounded-lg p-3 mb-3 shadow-sm hover:bg-gray-50 transition-colors pointer-events-auto ${
-          !isMobile ? "bg-gray-50 p-4 mb-4" : ""
-        }`}
+        className={cx(
+          "bg-white w-full border border-gray-100 rounded-lg p-3 mb-3 shadow-sm hover:bg-gray-50 transition-colors pointer-events-auto",
+          {
+            "bg-gray-50 p-4 mb-4": !isMobile,
+          },
+        )}
       >
         <div className="flex gap-3">
           <div className="relative flex-shrink-0 m-auto">
             <div
-              className={`bg-gray-200 rounded-lg flex items-center justify-center ${
-                isMobile ? "w-16 h-16" : "w-16 h-16"
-              }`}
+              className={cx(
+                "bg-gray-200 rounded-lg flex items-center justify-center",
+                {
+                  "w-16 h-16": true,
+                },
+              )}
             >
               <ShoppingBag
-                className={`text-gray-400 ${isMobile ? "w-4 h-4" : "w-6 h-6"}`}
+                className={cx("text-gray-400", {
+                  "w-4 h-4": isMobile,
+                  "w-6 h-6": !isMobile,
+                })}
               />
             </div>
-            {product.favorite && (
-              <div
-                className={`absolute bg-red-500 text-white text-xs px-1 rounded ${
-                  isMobile ? "-top-1 -left-1" : "-top-2 -left-2 px-2 py-1"
-                }`}
-              >
-                Yêu thích
-              </div>
-            )}
           </div>
           <div className="flex-1 min-w-0">
             <h4
               onClick={openProductDetailModal}
-              className={`font-medium text-gray-900 mb-2 cursor-pointer ${
-                isMobile ? "text-sm leading-tight" : "text-base"
-              }`}
+              className={cx("font-medium text-gray-900 mb-2 cursor-pointer", {
+                "text-sm leading-tight": isMobile,
+                "text-base": !isMobile,
+              })}
             >
               <span className="line-clamp-2">{product.name}</span>
             </h4>
             <div
-              className={`flex items-center justify-between ${isMobile ? "flex-col items-start gap-2" : ""}`}
+              className={cx("flex items-center justify-between", {
+                "flex-col items-start gap-2": isMobile,
+              })}
             >
               <div
-                className={`flex items-center gap-2 flex-wrap ${
-                  !isMobile ? "gap-3" : ""
-                }`}
+                className={cx("flex items-center gap-2 flex-wrap", {
+                  "gap-3": !isMobile,
+                })}
               >
                 <span
-                  className={`font-bold text-red-600 whitespace-nowrap ${
-                    isMobile ? "text-lg" : "text-xl"
-                  }`}
+                  className={cx("font-bold text-red-600 whitespace-nowrap", {
+                    "text-lg": isMobile,
+                    "text-xl": !isMobile,
+                  })}
                 >
                   ₫{product.price}
                 </span>
@@ -85,9 +90,13 @@ export const ProductItem: React.FC<ProductItemProps> = React.memo(
               </div>
               <button
                 onClick={handleProductBuyClick}
-                className={`bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors whitespace-nowrap flex-shrink-0 cursor-pointer ${
-                  isMobile ? "px-4 py-2 text-sm w-full mt-1" : "px-6 py-2"
-                }`}
+                className={cx(
+                  "bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors whitespace-nowrap flex-shrink-0 cursor-pointer",
+                  {
+                    "px-4 py-2 text-sm w-full mt-1": isMobile,
+                    "px-6 py-2": !isMobile,
+                  },
+                )}
               >
                 Mua ngay
               </button>
