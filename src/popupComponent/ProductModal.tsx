@@ -1,7 +1,7 @@
 import React, { useCallback, type FC } from "react";
 import { X } from "lucide-react";
 import { ProductItem } from "./ProductItem";
-import type { IVideo, IProduct } from "../data/videoData";
+import type { IVideo, IProduct } from "../data";
 
 interface IProductModalProps {
   isOpen: boolean;

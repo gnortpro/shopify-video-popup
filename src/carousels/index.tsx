@@ -1,18 +1,12 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  type FC,
-} from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Virtual } from "swiper/modules";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { Swiper as SwiperType } from "swiper/types";
 import cx from "classnames";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useCallback, useState, type FC } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
-import { SLIDES } from "./const";
+import { Navigation, Virtual } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper/types";
+import { VIDEOS } from "../data";
 import { VideoSlideItem } from "./carouselItem";
 
 interface IVideoSliderProps {
@@ -61,7 +55,7 @@ export const VideoSlider: FC<IVideoSliderProps> = ({ onSlideClick }) => {
           }}
           virtual
         >
-          {SLIDES.map((slide, index) => (
+          {VIDEOS.map((slide, index) => (
             <SwiperSlide key={slide.id} virtualIndex={index}>
               <VideoSlideItem
                 slide={slide}

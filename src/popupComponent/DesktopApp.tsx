@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState, type FC } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import cx from "classnames";
-import type { IVideo } from "../data/videoData";
 import { VideoPlayer } from "./VideoPlayer";
+import { VIDEOS, type IVideo } from "../data";
 
 interface IDesktopAppProps {
   videos: IVideo[];
@@ -32,33 +32,28 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
       const newIndex = (currentVideoIndex + 1) % videos.length;
       setCurrentVideoIndex(newIndex);
       setProgress(0);
-      if (currentVideoItem) onVideoChange?.(currentVideoItem);
+      onVideoChange?.(VIDEOS[newIndex]);
       setTimeout(() => {
         setIsTransitioning(false);
         setSlideDirection(null);
       }, 150);
     }, 150);
-  }, [
-    isTransitioning,
-    currentVideoIndex,
-    currentVideoItem,
-    videos.length,
-    onVideoChange,
-  ]);
+  }, [isTransitioning, currentVideoIndex, videos.length, onVideoChange]);
 
   const handlePrevVideo = useCallback((): void => {
     const newIndex =
       currentVideoIndex === 0 ? videos.length - 1 : currentVideoIndex - 1;
+
     setCurrentVideoIndex(newIndex);
     setProgress(0);
-    if (currentVideoItem) onVideoChange?.(currentVideoItem);
+    onVideoChange?.(VIDEOS[newIndex]);
     setIsTransitioning(true);
     setSlideDirection("down");
     setTimeout(() => {
       setIsTransitioning(false);
       setSlideDirection(null);
     }, 150);
-  }, [currentVideoIndex, currentVideoItem, videos.length, onVideoChange]);
+  }, [currentVideoIndex, videos.length, onVideoChange]);
 
   const handlePlayPause = useCallback((): void => {
     setIsPlaying(!isPlaying);
@@ -139,7 +134,6 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
         >
           <VideoPlayer
             video={currentVideoItem}
-            currentIndex={currentVideoIndex}
             totalVideos={videos.length}
             progress={progress}
             isPlaying={isPlaying}
@@ -147,8 +141,6 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
             onScreenClick={handleScreenClick}
             onPlayPause={handlePlayPause}
             onMute={handleMute}
-            onPrevVideo={handlePrevVideo}
-            onNextVideo={handleNextVideo}
             formatTime={formatTime}
             isMobile={false}
             onProgressUpdate={handleProgressUpdate}
@@ -156,12 +148,14 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
           <div className="absolute -right-20 top-1/2 -translate-y-1/2 flex flex-col gap-4">
             <button
               onClick={handlePrevVideo}
+              disabled={currentVideoIndex === 0}
               className="w-14 h-14 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
             >
               <ChevronUpIcon />
             </button>
             <button
               onClick={handleNextVideo}
+              disabled={currentVideoIndex === VIDEOS.length - 1}
               className="w-14 h-14 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
             >
               <ChevronDownIcon />

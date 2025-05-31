@@ -15,15 +15,14 @@ import {
   X,
 } from "lucide-react";
 import cx from "classnames";
-import { videos, type IVideo } from "../data/videoData";
 import { ProductModal } from "./ProductModal";
 import { ProductItem } from "./ProductItem";
 import { CartModal } from "./CartModal";
 import { ProductDetailModal } from "./ProductDetailModal";
+import { VIDEOS, type IVideo } from "../data";
 
 interface IVideoPlayerProps {
   video: IVideo;
-  currentIndex: number;
   totalVideos: number;
   progress: number;
   isPlaying: boolean;
@@ -31,8 +30,8 @@ interface IVideoPlayerProps {
   onScreenClick: () => void;
   onPlayPause: () => void;
   onMute: () => void;
-  onPrevVideo: () => void;
-  onNextVideo: () => void;
+  // onPrevVideo: () => void;
+  // onNextVideo: () => void;
   formatTime: (seconds: number) => string;
   isMobile?: boolean;
   onProgressUpdate?: (progress: number) => void;
@@ -227,19 +226,19 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
 
       <div
         className={cx("absolute top-4 right-4 z-40 flex", {
-          "gap-2": videos[0].products.length > 0,
+          "gap-2": video.products.length > 0,
         })}
       >
         <button
           onClick={handleCartModalClick}
           className="relative w-12 h-12 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
-          title={`Xem sản phẩm (${videos[0].products.length})`}
+          title={`Xem sản phẩm (${video.products.length})`}
         >
           <ShoppingCart className="w-6 h-6 text-orange-500" />
-          {videos[0].products.length > 0 && (
+          {video.products.length > 0 && (
             <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">
-                {videos[0].products.length}
+                {video.products.length}
               </span>
             </div>
           )}
@@ -250,7 +249,7 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
             className={cx(
               "w-6 h-6 text-white cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors duration-200",
               {
-                "mt-3": videos[0].products.length > 0,
+                "mt-3": video.products.length > 0,
               },
             )}
           >
@@ -264,16 +263,16 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
           onClick={handleProductModalClick}
         >
           <ShoppingBag size="30" className="text-orange-500" />
-          {videos[0].products.length > 0 && (
+          {video.products.length > 0 && (
             <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">
-                {videos[0].products.length}
+                {video.products.length}
               </span>
             </div>
           )}
         </button>
         <ProductItem
-          product={videos[0].products[0]}
+          product={video.products[0]}
           isMobile={isMobile}
           onBuyNow={handleBuyNow}
           onOpenProductDetailModal={() => setOpenProductDetailModal(true)}
@@ -301,7 +300,7 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
       <ProductDetailModal
         isOpen={isOpenProductDetailModal}
         onClose={() => setOpenProductDetailModal(false)}
-        product={videos[0].products[0]}
+        product={video.products[0]}
         isMobile={isMobile}
       />
       <ProductModal

@@ -7,7 +7,7 @@ import React, {
   type FC,
 } from "react";
 import cx from "classnames";
-import type { IProduct } from "../data/videoData";
+import type { IProduct } from "../data";
 
 interface IProductDetailModalProps {
   isOpen: boolean;

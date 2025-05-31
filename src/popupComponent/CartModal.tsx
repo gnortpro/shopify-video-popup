@@ -1,7 +1,7 @@
 import React, { useCallback, type FC } from "react";
 import { X } from "lucide-react";
-import type { IVideo, IProduct } from "../data/videoData";
 import { CartItem } from "./CartItem";
+import type { IProduct, IVideo } from "../data";
 
 interface ICartModalProps {
   isOpen: boolean;

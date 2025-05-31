@@ -1,9 +1,9 @@
 import { Play } from "lucide-react";
 import { useCallback, type FC } from "react";
-import type { ISlide } from "./const";
+import type { IVideo } from "../data";
 
 interface IVideoSlideItemProps {
-  slide: ISlide;
+  slide: IVideo;
   onClick: () => void;
 }
 

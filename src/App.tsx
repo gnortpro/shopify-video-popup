@@ -2,12 +2,12 @@ import React, { useState, useEffect, useCallback, type FC } from "react";
 import Modal from "react-modal";
 import { X } from "lucide-react";
 import cx from "classnames";
-import { MobileApp } from "./popupComponent/components/MobileApp";
-import { videos, type IVideo } from "./popupComponent/data/videoData";
-import { DesktopApp } from "./popupComponent/components/DesktopApp";
+import { MobileApp } from "./popupComponent/MobileApp";
+import { DesktopApp } from "./popupComponent/DesktopApp";
 import { VideoStories } from "./stories";
 import { VideoSlider } from "./carousels";
 import { VideoPopup } from "./popup";
+import { VIDEOS, type IVideo } from "./data";
 
 const App: FC = () => {
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
@@ -30,7 +30,7 @@ const App: FC = () => {
 
   const handleStoryClick = useCallback((id: number) => {
     setCurrentVideoItem(
-      videos.find((video) => video.id === Number(id)) || videos[0],
+      VIDEOS.find((video) => video.id === Number(id)) || VIDEOS[0],
     );
   }, []);
 
@@ -49,7 +49,7 @@ const App: FC = () => {
   return (
     <div className="">
       <div className="bg-white overflow-hidden mb-8">
-        <VideoStories onStoryClick={handleStoryClick} />
+        <VideoStories stories={VIDEOS} onStoryClick={handleStoryClick} />
       </div>
       <div className="bg-white overflow-hidden mb-8">
         <VideoSlider onSlideClick={handleStoryClick} />
@@ -82,13 +82,13 @@ const App: FC = () => {
           {isMobile ? (
             <MobileApp
               onHideModal={onHideModal}
-              videos={videos}
+              videos={VIDEOS}
               onVideoChange={handleVideoChange}
               currentVideoItem={currentVideoItem}
             />
           ) : (
             <DesktopApp
-              videos={videos}
+              videos={VIDEOS}
               onVideoChange={handleVideoChange}
               currentVideoItem={currentVideoItem}
             />

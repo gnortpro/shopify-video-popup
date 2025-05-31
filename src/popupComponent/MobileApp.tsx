@@ -5,9 +5,8 @@ import React, {
   useState,
   type FC,
 } from "react";
-import type { IVideo } from "../data/videoData";
-import { ProductModal } from "./ProductModal";
 import { VideoPlayer } from "./VideoPlayer";
+import type { IVideo } from "../data";
 
 interface IMobileAppProps {
   videos: IVideo[];
@@ -97,14 +96,6 @@ export const MobileApp: FC<IMobileAppProps> = ({
     }
   }, [touchStart, touchEnd, handleNextVideo, handlePrevVideo]);
 
-  const handleShoppingBagClick = useCallback((): void => {
-    setShowProductModal(true);
-  }, []);
-
-  const handleProductModalClose = useCallback((): void => {
-    setShowProductModal(false);
-  }, []);
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent): void => {
       if (e.key === "ArrowUp") {
@@ -164,7 +155,6 @@ export const MobileApp: FC<IMobileAppProps> = ({
       >
         <VideoPlayer
           video={currentVideoItem}
-          currentIndex={currentVideoIndex}
           totalVideos={videos.length}
           progress={progress}
           isPlaying={isPlaying}

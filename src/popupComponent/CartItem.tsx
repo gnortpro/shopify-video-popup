@@ -1,7 +1,7 @@
 import React, { useCallback, useState, type ChangeEvent, type FC } from "react";
 import { Minus, Plus, ShoppingBag } from "lucide-react";
 import cx from "classnames";
-import type { IProduct } from "../data/videoData";
+import type { IProduct } from "../data";
 
 interface ICartItemProps {
   product: IProduct;

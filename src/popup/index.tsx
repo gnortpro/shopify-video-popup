@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, type FC } from "react";
 import { X } from "lucide-react";
-import { VIDEO_URL } from "./const";
+import { VIDEO_URL } from "../data";
 
 interface IVideoPopupPlayerProps {
   onVideoClick: () => void;

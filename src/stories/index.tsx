@@ -2,13 +2,16 @@ import React, { useCallback, useRef, type FC } from "react";
 import type { Swiper as SwiperType } from "swiper";
 import { Navigation, Virtual } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { STORIES, SWIPER_BREAKPOINTS } from "./consts";
 import { CustomNavigationButton } from "./navigation";
 import { StoryItem } from "./storyItem";
-import type { IStoriesCarouselProps, IStory } from "./types";
+import {
+  STORIES_SWIPER_BREAKPOINTS,
+  type IStoriesCarouselProps,
+  type IVideo,
+} from "../data";
 
 export const VideoStories: FC<IStoriesCarouselProps> = ({
-  stories = STORIES,
+  stories,
   onStoryClick,
 }) => {
   const swiperRef = useRef<SwiperType>(null);
@@ -16,8 +19,8 @@ export const VideoStories: FC<IStoriesCarouselProps> = ({
   const [isEnd, setIsEnd] = React.useState(false);
 
   const handleStoryClick = useCallback(
-    (story: IStory): void => {
-      console.log("Story clicked:", story.username);
+    (story: IVideo): void => {
+      console.log("Story clicked:", story.title);
       onStoryClick?.(story.id);
     },
     [onStoryClick],
@@ -60,7 +63,7 @@ export const VideoStories: FC<IStoriesCarouselProps> = ({
           modules={[Navigation, Virtual]}
           slidesPerView="auto"
           spaceBetween={0}
-          breakpoints={SWIPER_BREAKPOINTS}
+          breakpoints={STORIES_SWIPER_BREAKPOINTS}
           grabCursor={true}
           normalizeSlideIndex={false}
           preventClicks={false}
