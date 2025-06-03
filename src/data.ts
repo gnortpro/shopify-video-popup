@@ -49,7 +49,9 @@ export const VIDEOS: IVideo[] = [
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Cải thiện tiếng Anh",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
-    mediaType: "image",
+    mediaType: "video",
+    videoUrl:
+      "https://down-tx-sg.vod.susercontent.com/api/v4/11110105/mms/vn-11110105-6ke15-ltno3gyz7oct71.16004111727745367.mp4",
     duration: 60,
     products: [
       {
@@ -91,7 +93,7 @@ export const VIDEOS: IVideo[] = [
       "https://videos.pexels.com/video-files/32330745/13791049_1440_2560_30fps.mp4",
     mediaType: "video",
     videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      "https://down-bs-sg.vod.susercontent.com/api/v4/11110105/mms/vn-11110105-6ke14-llub0rk1yy1rdd.16000081695104243.mp4",
     thumbnailUrl:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
     duration: 60,
@@ -134,7 +136,7 @@ export const VIDEOS: IVideo[] = [
       "https://videos.pexels.com/video-files/17169505/17169505-hd_1080_1920_30fps.mp4",
     mediaType: "video",
     videoUrl:
-      "https://down-tx-sg.vod.susercontent.com/api/v4/11110105/mms/vn-11110105-6khwd-m6idc7bk1dpda8.16000081740145779.mp4",
+      "https://down-ws-sg.vod.susercontent.com/c3/98934353/105/A3oxOHjJAJDQjHAJESEDACY.mp4",
     thumbnailUrl:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
     duration: 60,
@@ -217,7 +219,9 @@ export const VIDEOS: IVideo[] = [
     title: "VIỆC ĐI HỌC VÀ ĐI LÀM",
     subtitle: "Cải thiện tiếng Anh",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
-    mediaType: "image",
+    mediaType: "video",
+    videoUrl:
+      "https://down-ws-sg.vod.susercontent.com/api/v4/11110105/mms/vn-11110105-6ke17-lvts0ojcccm12e.16000081716864694.mp4",
     duration: 60,
     products: [
       {

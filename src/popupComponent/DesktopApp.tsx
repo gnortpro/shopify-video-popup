@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useState, type FC } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FC,
+} from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import cx from "classnames";
 import { VideoPlayer } from "./VideoPlayer";
@@ -15,6 +21,9 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
   onVideoChange,
   currentVideoItem,
 }) => {
+  const transitioningRef = useRef(false);
+  const lastWheelTimeRef = useRef(0);
+
   const [currentVideoIndex, setCurrentVideoIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(false);
@@ -26,35 +35,43 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
   const [shouldHideNavigation, setShouldHideNavigation] = useState(false);
 
   const handleNextVideo = useCallback((): void => {
-    if (isTransitioning) return;
+    if (transitioningRef.current) return;
+
     setIsTransitioning(true);
+    transitioningRef.current = true;
     setSlideDirection("up");
+
     setTimeout(() => {
       const newIndex = (currentVideoIndex + 1) % videos.length;
       setCurrentVideoIndex(newIndex);
       setProgress(0);
-      onVideoChange?.(VIDEOS[newIndex]);
-      setTimeout(() => {
-        setIsTransitioning(false);
-        setSlideDirection(null);
-      }, 150);
-    }, 150);
-  }, [isTransitioning, currentVideoIndex, videos.length, onVideoChange]);
+      onVideoChange?.(videos[newIndex]);
 
-  const handlePrevVideo = useCallback((): void => {
-    const newIndex =
-      currentVideoIndex === 0 ? videos.length - 1 : currentVideoIndex - 1;
-
-    setCurrentVideoIndex(newIndex);
-    setProgress(0);
-    onVideoChange?.(VIDEOS[newIndex]);
-    setIsTransitioning(true);
-    setSlideDirection("down");
-    setTimeout(() => {
       setIsTransitioning(false);
+      transitioningRef.current = false;
       setSlideDirection(null);
     }, 150);
-  }, [currentVideoIndex, videos.length, onVideoChange]);
+  }, [currentVideoIndex, videos, onVideoChange]);
+
+  const handlePrevVideo = useCallback((): void => {
+    if (transitioningRef.current) return;
+
+    setIsTransitioning(true);
+    transitioningRef.current = true;
+    setSlideDirection("down");
+
+    setTimeout(() => {
+      const newIndex =
+        currentVideoIndex === 0 ? videos.length - 1 : currentVideoIndex - 1;
+      setCurrentVideoIndex(newIndex);
+      setProgress(0);
+      onVideoChange?.(videos[newIndex]);
+
+      setIsTransitioning(false);
+      transitioningRef.current = false;
+      setSlideDirection(null);
+    }, 150);
+  }, [currentVideoIndex, videos, onVideoChange]);
 
   const handlePlayPause = useCallback((): void => {
     setIsPlaying(!isPlaying);
@@ -93,11 +110,17 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
     };
 
     const handleWheel = (e: WheelEvent): void => {
+      const now = Date.now();
+      const last = lastWheelTimeRef.current;
+
+      if (now - last < 1400 || transitioningRef.current) return;
+
+      lastWheelTimeRef.current = now;
       e.preventDefault();
-      const delta = e.deltaY;
-      if (delta > 0) {
+
+      if (e.deltaY > 0) {
         handleNextVideo();
-      } else if (delta < 0) {
+      } else if (e.deltaY < 0) {
         handlePrevVideo();
       }
     };
@@ -126,6 +149,10 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
     }
   }, [isPlaying, currentVideoItem, handleNextVideo]);
 
+  useEffect(() => {
+    transitioningRef.current = isTransitioning;
+  }, [isTransitioning]);
+
   return (
     <div className="min-h-screen bg-black text-white flex justify-center items-center relative">
       <div className="relative">
@@ -139,6 +166,7 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
           })}
         >
           <VideoPlayer
+            key={currentVideoItem.id}
             video={currentVideoItem}
             totalVideos={videos.length}
             progress={progress}
