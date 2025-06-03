@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, type FC } from "react";
 import type { Swiper as SwiperType } from "swiper";
-import { Navigation, Virtual } from "swiper/modules";
+import { Mousewheel, Navigation, Virtual } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { CustomNavigationButton } from "./navigation";
 import { StoryItem } from "./storyItem";
@@ -60,7 +60,8 @@ export const VideoStories: FC<IStoriesCarouselProps> = ({
         />
 
         <Swiper
-          modules={[Navigation, Virtual]}
+          direction="horizontal"
+          modules={[Navigation, Mousewheel, Virtual]}
           slidesPerView="auto"
           spaceBetween={0}
           breakpoints={STORIES_SWIPER_BREAKPOINTS}
@@ -72,6 +73,7 @@ export const VideoStories: FC<IStoriesCarouselProps> = ({
           onSwiper={handleSwiperInit}
           onSlideChange={handleSlideChange}
           virtual
+          mousewheel={{ enabled: true, thresholdDelta: 5 }}
         >
           {stories.map((story) => (
             <SwiperSlide key={story.id}>

@@ -6,7 +6,7 @@ import React, {
   type FC,
 } from "react";
 import { VideoPlayer } from "./VideoPlayer";
-import type { IVideo } from "../data";
+import { VIDEOS, type IVideo } from "../data";
 
 interface IMobileAppProps {
   videos: IVideo[];
@@ -34,16 +34,16 @@ export const MobileApp: FC<IMobileAppProps> = ({
     const newIndex = (currentVideoIndex + 1) % videos.length;
     setCurrentVideoIndex(newIndex);
     setProgress(0);
-    onVideoChange?.(currentVideoItem);
-  }, [currentVideoIndex, videos.length, currentVideoItem, onVideoChange]);
+    onVideoChange?.(VIDEOS[newIndex]);
+  }, [currentVideoIndex, videos.length, onVideoChange]);
 
   const handlePrevVideo = useCallback((): void => {
     const newIndex =
       currentVideoIndex === 0 ? videos.length - 1 : currentVideoIndex - 1;
     setCurrentVideoIndex(newIndex);
     setProgress(0);
-    onVideoChange?.(currentVideoItem);
-  }, [currentVideoIndex, currentVideoItem, videos.length, onVideoChange]);
+    onVideoChange?.(VIDEOS[newIndex]);
+  }, [currentVideoIndex, videos.length, onVideoChange]);
 
   const handlePlayPause = useCallback((): void => {
     setIsPlaying(!isPlaying);
@@ -162,8 +162,6 @@ export const MobileApp: FC<IMobileAppProps> = ({
           onScreenClick={handleScreenClick}
           onPlayPause={handlePlayPause}
           onMute={handleMute}
-          onPrevVideo={handlePrevVideo}
-          onNextVideo={handleNextVideo}
           formatTime={formatTime}
           isMobile={true}
           onProgressUpdate={handleProgressUpdate}

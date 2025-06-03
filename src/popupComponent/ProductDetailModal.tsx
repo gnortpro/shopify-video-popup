@@ -1,4 +1,4 @@
-import { ShoppingCart, X } from "lucide-react";
+import { Pause, Play, ShoppingCart, Volume2, VolumeX, X } from "lucide-react";
 import React, {
   useCallback,
   useRef,
@@ -7,7 +7,12 @@ import React, {
   type FC,
 } from "react";
 import cx from "classnames";
-import type { IProduct } from "../data";
+import type { IProduct, IProductMediaType } from "../data";
+import { Mousewheel, Pagination, Navigation, Virtual } from "swiper/modules";
+import type { Swiper as SwiperType } from "swiper";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { CustomNavigationButton } from "../stories/navigation";
+import { ProductGalleryModal } from "./ProductGalleryModal";
 
 interface IProductDetailModalProps {
   isOpen: boolean;
@@ -23,11 +28,32 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
   isMobile,
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const swiperRef = useRef<SwiperType>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isBeginning, setIsBeginning] = React.useState(true);
+  const [isEnd, setIsEnd] = React.useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isPlaying, setPlaying] = useState(true);
+  const [isMuted, setMuted] = useState(true);
+  const [mediaModalFiles, setMediaModalFiles] = useState<IProductMediaType[]>(
+    [],
+  );
 
-  const handleBuyNow = useCallback((productId: number): void => {
-    console.log("Buy now clicked for product:", productId);
-  }, []);
+  const handlePlayPauseClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>): void => {
+      e.stopPropagation();
+      setPlaying(!isPlaying);
+    },
+    [isPlaying],
+  );
+
+  const handleMuteClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>): void => {
+      e.stopPropagation();
+      setMuted(!isMuted);
+    },
+    [isMuted],
+  );
 
   const handleOverlayClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>): void => {
@@ -50,8 +76,6 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
       const target = e.currentTarget;
       const scrollTop = target.scrollTop;
 
-      console.log("Scroll position:", scrollTop);
-
       if (scrollTop > 50 && !isFullScreen) {
         setIsFullScreen(true);
         console.log("Switching to full screen");
@@ -62,6 +86,35 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
     },
     [isFullScreen],
   );
+
+  const handleSwiperInit = useCallback((swiper: SwiperType): void => {
+    swiperRef.current = swiper;
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
+  }, []);
+
+  const handleSlideChange = useCallback((swiper: SwiperType): void => {
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
+  }, []);
+
+  const handlePrevClick = useCallback((): void => {
+    swiperRef.current?.slidePrev();
+  }, []);
+
+  const handleNextClick = useCallback((): void => {
+    swiperRef.current?.slideNext();
+  }, []);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.play().catch(console.error);
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isPlaying]);
 
   useEffect(() => {
     if (isOpen) {
@@ -106,15 +159,85 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
           onScroll={handleScroll}
           onWheel={handleScroll}
         >
-          <div className="relative">
-            <img
-              src={product.image}
-              alt=""
-              className={cx("w-full object-cover", {
-                "h-64": isMobile,
-                "h-72": !isMobile,
-              })}
+          <div className="relative cursor-pointer">
+            <CustomNavigationButton
+              direction="prev"
+              onClick={handlePrevClick}
+              disabled={isBeginning}
+              size="medium"
+              iconSize={16}
             />
+            <CustomNavigationButton
+              direction="next"
+              onClick={handleNextClick}
+              disabled={isEnd}
+              size="medium"
+              iconSize={16}
+            />
+            <Swiper
+              direction="horizontal"
+              modules={[Navigation, Pagination, Mousewheel, Virtual]}
+              slidesPerView={1}
+              virtual
+              pagination
+              mousewheel={{ enabled: true }}
+              onSwiper={handleSwiperInit}
+              onSlideChange={handleSlideChange}
+              onClick={() => setMediaModalFiles(product.mediaFiles)}
+            >
+              {product.mediaFiles.map((media, index) => (
+                <SwiperSlide key={index}>
+                  {media.type === "video" ? (
+                    <>
+                      <div className="absolute top-4 left-4 flex flex-row gap-2 z-40">
+                        <button
+                          onClick={handlePlayPauseClick}
+                          className="control-button w-6 h-6 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
+                          title={isPlaying ? "Pause" : "Play"}
+                        >
+                          {isPlaying ? (
+                            <Pause className="w-3 h-3 text-white" />
+                          ) : (
+                            <Play className="w-3 h-3 text-white ml-0.5" />
+                          )}
+                        </button>
+                        <button
+                          onClick={handleMuteClick}
+                          className="w-6 h-6 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
+                          title={isMuted ? "Unmute" : "Mute"}
+                        >
+                          {isMuted ? (
+                            <VolumeX className="w-3 h-3 text-white" />
+                          ) : (
+                            <Volume2 className="w-3 h-3 text-white" />
+                          )}
+                        </button>
+                      </div>
+                      <video
+                        ref={videoRef}
+                        src={media.url}
+                        autoPlay
+                        muted={isMuted}
+                        loop
+                        className={cx("w-full object-contain", {
+                          "h-64": isMobile,
+                          "h-72": !isMobile,
+                        })}
+                      />
+                    </>
+                  ) : (
+                    <img
+                      src={media.url}
+                      alt=""
+                      className={cx("w-full object-contain", {
+                        "h-64": isMobile,
+                        "h-72": !isMobile,
+                      })}
+                    />
+                  )}
+                </SwiperSlide>
+              ))}
+            </Swiper>
             <button
               onClick={handleCloseClick}
               className="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors text-xl cursor-pointer pointer-events-auto z-10"
@@ -131,7 +254,7 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
 
           <div
             className={cx("bg-white px-4 py-4 pb-24", {
-              "max-h-[80%] overflow-y-auto": !isMobile,
+              "max-h-[calc(100vh-550px)] overflow-y-auto": !isMobile,
             })}
           >
             <div className="mb-3">
@@ -284,6 +407,11 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
           </div>
         </div>
       </div>
+      <ProductGalleryModal
+        isOpen={!!mediaModalFiles.length}
+        onClose={() => setMediaModalFiles([])}
+        mediaFiles={mediaModalFiles}
+      />
     </>
   );
 };

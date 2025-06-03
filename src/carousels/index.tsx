@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useState, type FC } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
-import { Navigation, Virtual } from "swiper/modules";
+import { Mousewheel, Navigation, Virtual } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper/types";
 import { VIDEOS } from "../data";
@@ -33,7 +33,7 @@ export const VideoSlider: FC<IVideoSliderProps> = ({ onSlideClick }) => {
     <div className="w-full max-w-4xl mx-auto">
       <div className="relative">
         <Swiper
-          modules={[Virtual, Navigation]}
+          modules={[Virtual, Mousewheel, Navigation]}
           spaceBetween={20}
           slidesPerView={1.2}
           centeredSlides={false}
@@ -54,6 +54,7 @@ export const VideoSlider: FC<IVideoSliderProps> = ({ onSlideClick }) => {
             },
           }}
           virtual
+          mousewheel={{ enabled: true, thresholdDelta: 5 }}
         >
           {VIDEOS.map((slide, index) => (
             <SwiperSlide key={slide.id} virtualIndex={index}>

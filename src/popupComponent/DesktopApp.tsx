@@ -23,6 +23,7 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
   const [slideDirection, setSlideDirection] = useState<"up" | "down" | null>(
     null,
   );
+  const [shouldHideNavigation, setShouldHideNavigation] = useState(false);
 
   const handleNextVideo = useCallback((): void => {
     if (isTransitioning) return;
@@ -63,6 +64,10 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
     setIsMuted(!isMuted);
   }, [isMuted]);
 
+  const handleHideNavigation = useCallback((value: boolean): void => {
+    setShouldHideNavigation(value);
+  }, []);
+
   const handleScreenClick = useCallback((): void => {}, []);
 
   const formatTime = useCallback((seconds: number): string => {
@@ -76,6 +81,7 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
   }, []);
 
   useEffect(() => {
+    if (shouldHideNavigation) return;
     const handleKeyDown = (e: KeyboardEvent): void => {
       if (e.key === "ArrowUp") {
         e.preventDefault();
@@ -103,7 +109,7 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("wheel", handleWheel);
     };
-  }, [handlePrevVideo, handleNextVideo]);
+  }, [handlePrevVideo, handleNextVideo, shouldHideNavigation]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -142,25 +148,28 @@ export const DesktopApp: FC<IDesktopAppProps> = ({
             onPlayPause={handlePlayPause}
             onMute={handleMute}
             formatTime={formatTime}
+            hideNavigation={handleHideNavigation}
             isMobile={false}
             onProgressUpdate={handleProgressUpdate}
           />
-          <div className="absolute -right-20 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-            <button
-              onClick={handlePrevVideo}
-              disabled={currentVideoIndex === 0}
-              className="w-14 h-14 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
-            >
-              <ChevronUpIcon />
-            </button>
-            <button
-              onClick={handleNextVideo}
-              disabled={currentVideoIndex === VIDEOS.length - 1}
-              className="w-14 h-14 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
-            >
-              <ChevronDownIcon />
-            </button>
-          </div>
+          {!shouldHideNavigation && (
+            <div className="absolute -right-20 top-1/2 -translate-y-1/2 flex flex-col gap-4">
+              <button
+                onClick={handlePrevVideo}
+                disabled={currentVideoIndex === 0}
+                className="w-14 h-14 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
+              >
+                <ChevronUpIcon />
+              </button>
+              <button
+                onClick={handleNextVideo}
+                disabled={currentVideoIndex === VIDEOS.length - 1}
+                className="w-14 h-14 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
+              >
+                <ChevronDownIcon />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

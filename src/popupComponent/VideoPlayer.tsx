@@ -35,6 +35,7 @@ interface IVideoPlayerProps {
   formatTime: (seconds: number) => string;
   isMobile?: boolean;
   onProgressUpdate?: (progress: number) => void;
+  hideNavigation?: (value: boolean) => void;
   onHideModal?: () => void;
 }
 
@@ -48,6 +49,7 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
   isMobile = false,
   onProgressUpdate,
   onHideModal,
+  hideNavigation,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [localProgress, setLocalProgress] = useState<number>(0);
@@ -164,6 +166,18 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
       }, 600);
     }
   }, [showPlayPauseIcon]);
+
+  useEffect(() => {
+    if (hideNavigation)
+      hideNavigation(
+        isOpenProductDetailModal || isOpenProductModal || isOpenCartModal,
+      );
+  }, [
+    isOpenProductDetailModal,
+    isOpenProductModal,
+    isOpenCartModal,
+    hideNavigation,
+  ]);
 
   return (
     <div
