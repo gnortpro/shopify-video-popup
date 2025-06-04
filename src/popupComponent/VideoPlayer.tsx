@@ -19,7 +19,7 @@ import { ProductModal } from "./ProductModal";
 import { ProductItem } from "./ProductItem";
 import { CartModal } from "./CartModal";
 import { ProductDetailModal } from "./ProductDetailModal";
-import { VIDEOS, type IVideo } from "../data";
+import { type IVideo } from "../data";
 
 interface IVideoPlayerProps {
   video: IVideo;
@@ -57,6 +57,16 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
   const [isOpenCartModal, setOpenCartModal] = useState(false);
   const [showPlayPauseIcon, setShowPlayPauseIcon] = useState(false);
   const [isOpenProductDetailModal, setOpenProductDetailModal] = useState(false);
+  const [isShowFooter, setShowFooter] = useState(window.innerWidth >= 330);
+
+  const handleResize = useCallback((): void => {
+    setShowFooter(window.innerWidth >= 330);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [handleResize]);
 
   const handleTimeUpdate = useCallback((): void => {
     if (videoRef.current) {
@@ -271,27 +281,29 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
           </button>
         )}
       </div>
-      <div className="absolute bottom-0 left-0 p-4 right-0 pointer-events-none flex items-center gap-6 z-50">
-        <button
-          className="relative w-14 h-14 bg-white/10 hover:bg-white/10 rounded-full flex items-center justify-center hover:scale-110 cursor-pointer pointer-events-auto"
-          onClick={handleProductModalClick}
-        >
-          <ShoppingBag size="30" className="text-orange-500" />
-          {video.products.length > 0 && (
-            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs font-bold">
-                {video.products.length}
-              </span>
-            </div>
-          )}
-        </button>
-        <ProductItem
-          product={video.products[0]}
-          isMobile={isMobile}
-          onBuyNow={handleBuyNow}
-          onOpenProductDetailModal={() => setOpenProductDetailModal(true)}
-        />
-      </div>
+      {isShowFooter && (
+        <div className="absolute bottom-0 left-0 p-4 right-0 pointer-events-none flex items-center gap-6 z-50">
+          <button
+            className="relative p-4 bg-white/10 hover:bg-white/10 rounded-full flex items-center justify-center hover:scale-110 cursor-pointer pointer-events-auto"
+            onClick={handleProductModalClick}
+          >
+            <ShoppingBag size="30" className="text-orange-500" />
+            {video.products.length > 0 && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs font-bold">
+                  {video.products.length}
+                </span>
+              </div>
+            )}
+          </button>
+          <ProductItem
+            product={video.products[0]}
+            isMobile={isMobile}
+            onBuyNow={handleBuyNow}
+            onOpenProductDetailModal={() => setOpenProductDetailModal(true)}
+          />
+        </div>
+      )}
       {!isPlaying && (
         <div className="absolute bottom-0 left-0 right-0 z-30">
           <div

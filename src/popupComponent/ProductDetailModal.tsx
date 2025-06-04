@@ -27,14 +27,22 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
   product,
   isMobile,
 }) => {
+  const localPlayState = localStorage.getItem("drv-video-state");
+  const localSoundState = localStorage.getItem("drv-video-sound");
+
   const wrapperRef = useRef<HTMLDivElement>(null);
   const swiperRef = useRef<SwiperType>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isBeginning, setIsBeginning] = React.useState(true);
   const [isEnd, setIsEnd] = React.useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [isPlaying, setPlaying] = useState(true);
-  const [isMuted, setMuted] = useState(true);
+  const [isPlaying, setPlaying] = useState(
+    localPlayState ? JSON.parse(localPlayState).playing : true,
+  );
+  const [isMuted, setMuted] = useState(
+    localSoundState ? JSON.parse(localSoundState).isMuted : true,
+  );
+  const [currentFileIndex, setCurrentFileIndex] = useState(0);
   const [mediaModalFiles, setMediaModalFiles] = useState<IProductMediaType[]>(
     [],
   );
@@ -43,6 +51,10 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
     (e: React.MouseEvent<HTMLButtonElement>): void => {
       e.stopPropagation();
       setPlaying(!isPlaying);
+      localStorage.setItem(
+        "drv-video-state",
+        JSON.stringify({ playing: !isPlaying }),
+      );
     },
     [isPlaying],
   );
@@ -51,6 +63,10 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
     (e: React.MouseEvent<HTMLButtonElement>): void => {
       e.stopPropagation();
       setMuted(!isMuted);
+      localStorage.setItem(
+        "drv-video-sound",
+        JSON.stringify({ isMuted: !isMuted }),
+      );
     },
     [isMuted],
   );
@@ -78,10 +94,8 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
 
       if (scrollTop > 50 && !isFullScreen) {
         setIsFullScreen(true);
-        console.log("Switching to full screen");
       } else if (scrollTop <= 20 && isFullScreen) {
         setIsFullScreen(false);
-        console.log("Switching back to 90vh");
       }
     },
     [isFullScreen],
@@ -100,11 +114,22 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
 
   const handlePrevClick = useCallback((): void => {
     swiperRef.current?.slidePrev();
-  }, []);
+    setPlaying(isPlaying);
+  }, [isPlaying]);
 
   const handleNextClick = useCallback((): void => {
     swiperRef.current?.slideNext();
+    setPlaying(false);
   }, []);
+
+  const handleSlideClick = useCallback(
+    (index: number) => () => {
+      setMediaModalFiles(product.mediaFiles);
+      setCurrentFileIndex(index);
+      setPlaying(false);
+    },
+    [product.mediaFiles],
+  );
 
   useEffect(() => {
     if (videoRef.current) {
@@ -183,10 +208,9 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
               mousewheel={{ enabled: true }}
               onSwiper={handleSwiperInit}
               onSlideChange={handleSlideChange}
-              onClick={() => setMediaModalFiles(product.mediaFiles)}
             >
               {product.mediaFiles.map((media, index) => (
-                <SwiperSlide key={index}>
+                <SwiperSlide key={index} onClick={handleSlideClick(index)}>
                   {media.type === "video" ? (
                     <>
                       <div className="absolute top-4 left-4 flex flex-row gap-2 z-40">
@@ -216,7 +240,7 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
                       <video
                         ref={videoRef}
                         src={media.url}
-                        autoPlay
+                        autoPlay={isPlaying}
                         muted={isMuted}
                         loop
                         className={cx("w-full object-contain", {
@@ -408,6 +432,7 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
         </div>
       </div>
       <ProductGalleryModal
+        currentFileIndex={currentFileIndex}
         isOpen={!!mediaModalFiles.length}
         onClose={() => setMediaModalFiles([])}
         mediaFiles={mediaModalFiles}

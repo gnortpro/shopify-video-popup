@@ -7,48 +7,53 @@ import React, {
   type FC,
 } from "react";
 import type { Swiper as SwiperType } from "swiper";
-import {
-  FreeMode,
-  Mousewheel,
-  Navigation,
-  Pagination,
-  Thumbs,
-  Virtual,
-} from "swiper/modules";
+import { FreeMode, Mousewheel, Navigation, Thumbs } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { IProductMediaType } from "../data";
 import { CustomNavigationButton } from "../stories/navigation";
+
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
-import "swiper/css/pagination";
 
 interface IProductGalleryModalProps {
   isOpen: boolean;
   onClose: () => void;
   mediaFiles: IProductMediaType[];
-  isMobile?: boolean;
+  currentFileIndex: number;
 }
 
 export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
   isOpen,
   onClose,
   mediaFiles,
-  isMobile,
+  currentFileIndex,
 }) => {
+  const localPlayState = localStorage.getItem("drv-video-state");
+  const localSoundState = localStorage.getItem("drv-video-sound");
+
   const wrapperRef = useRef<HTMLDivElement>(null);
   const swiperRef = useRef<SwiperType>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isBeginning, setIsBeginning] = React.useState(true);
   const [isEnd, setIsEnd] = React.useState(false);
-  const [isPlaying, setPlaying] = useState(true);
-  const [isMuted, setMuted] = useState(true);
+  const [isPlaying, setPlaying] = useState(
+    localPlayState ? JSON.parse(localPlayState).playing : true,
+  );
+  const [isMuted, setMuted] = useState(
+    localSoundState ? JSON.parse(localSoundState).isMuted : true,
+  );
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType>();
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const handlePlayPauseClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>): void => {
       e.stopPropagation();
       setPlaying(!isPlaying);
+      localStorage.setItem(
+        "drv-video-state",
+        JSON.stringify({ playing: !isPlaying }),
+      );
     },
     [isPlaying],
   );
@@ -57,6 +62,10 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
     (e: React.MouseEvent<HTMLButtonElement>): void => {
       e.stopPropagation();
       setMuted(!isMuted);
+      localStorage.setItem(
+        "drv-video-sound",
+        JSON.stringify({ isMuted: !isMuted }),
+      );
     },
     [isMuted],
   );
@@ -74,6 +83,7 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
   const handleSlideChange = useCallback((swiper: SwiperType): void => {
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
+    setActiveIndex(swiper.activeIndex);
   }, []);
 
   const handlePrevClick = useCallback((): void => {
@@ -82,6 +92,10 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
 
   const handleNextClick = useCallback((): void => {
     swiperRef.current?.slideNext();
+  }, []);
+
+  const handleThumbClick = useCallback((index: number): void => {
+    swiperRef.current?.slideTo(index);
   }, []);
 
   useEffect(() => {
@@ -94,15 +108,22 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
     }
   }, [isPlaying]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      swiperRef.current = null;
+      setThumbsSwiper(undefined);
+    }
+  }, [isOpen]);
+
   if (!isOpen || !mediaFiles?.length) return null;
 
   return (
-    <div className="absolute left-0 w-full z-100 flex items-end justify-center transition-all duration-300 ease-out animation-slideInUp top-0 h-screen">
+    <div className="absolute left-0 w-full z-100 flex items-end justify-center transition-all duration-300 ease-out animation-slideInUp top-0 h-full">
       <div
-        className="bg-white w-full transition-all duration-300 ease-out h-full rounded-none"
+        className="bg-white w-full transition-all duration-300 ease-out rounded-none flex flex-col h-full"
         ref={wrapperRef}
       >
-        <div className="relative cursor-pointer">
+        <div className="relative cursor-pointer h-full">
           <CustomNavigationButton
             direction="prev"
             onClick={handlePrevClick}
@@ -118,12 +139,12 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
             iconSize={16}
           />
           <Swiper
+            className="h-full"
             direction="horizontal"
-            thumbs={{ swiper: thumbsSwiper }}
-            modules={[Navigation, Pagination, Thumbs, Mousewheel, Virtual]}
+            thumbs={thumbsSwiper ? { swiper: thumbsSwiper } : undefined}
+            modules={[Navigation, Thumbs, Mousewheel]}
             slidesPerView={1}
-            virtual
-            pagination
+            initialSlide={currentFileIndex}
             mousewheel={{ enabled: true }}
             onSwiper={handleSwiperInit}
             onSlideChange={handleSlideChange}
@@ -159,12 +180,11 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
                     <video
                       ref={videoRef}
                       src={media.url}
-                      autoPlay
+                      autoPlay={isPlaying}
                       muted={isMuted}
                       loop
-                      className="w-full object-contain h-full"
+                      className="w-full object-cover h-full"
                     />
-                    {/* <Product3DViewer src="./Astronaut.glb" /> */}
                   </>
                 ) : (
                   <img
@@ -176,7 +196,6 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
               </SwiperSlide>
             ))}
           </Swiper>
-
           <button
             onClick={handleCloseClick}
             className="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors text-xl cursor-pointer pointer-events-auto z-10"
@@ -184,6 +203,70 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
             <X className="text-gray-400 w-5 h-5" />
           </button>
         </div>
+
+        {mediaFiles.length > 1 && (
+          <div className="p-4 absolute bottom-2 left-0 w-full">
+            <Swiper
+              onSwiper={setThumbsSwiper}
+              spaceBetween={8}
+              slidesPerView="auto"
+              freeMode={true}
+              watchSlidesProgress={true}
+              modules={[FreeMode, Thumbs]}
+              className="thumbs-swiper"
+              centerInsufficientSlides={true}
+              style={
+                {
+                  "--swiper-wrapper-transition-timing-function": "linear",
+                } as React.CSSProperties
+              }
+            >
+              {mediaFiles.map((media, index) => (
+                <SwiperSlide
+                  key={index}
+                  className="!w-auto cursor-pointer"
+                  onClick={() => handleThumbClick(index)}
+                >
+                  <div
+                    className={`
+                      relative w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden 
+                      border-2 transition-all duration-200
+                      ${
+                        activeIndex === index
+                          ? "border-blue-500 shadow-md"
+                          : "border-gray-300 hover:border-gray-400"
+                      }
+                    `}
+                  >
+                    {media.type === "video" ? (
+                      <>
+                        <video
+                          src={media.url}
+                          className="w-full object-contain"
+                          muted
+                        />
+                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                          <Play className="w-4 h-4 text-white" />
+                        </div>
+                      </>
+                    ) : (
+                      <img
+                        src={media.url}
+                        alt=""
+                        className="w-full object-contain"
+                      />
+                    )}
+
+                    {/* Active indicator */}
+                    {activeIndex === index && (
+                      <div className="absolute inset-0 bg-blue-500/20 border border-blue-500 rounded-lg" />
+                    )}
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        )}
       </div>
     </div>
   );
