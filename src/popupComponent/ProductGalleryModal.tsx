@@ -7,10 +7,21 @@ import React, {
   type FC,
 } from "react";
 import type { Swiper as SwiperType } from "swiper";
-import { Mousewheel, Navigation, Pagination, Virtual } from "swiper/modules";
+import {
+  FreeMode,
+  Mousewheel,
+  Navigation,
+  Pagination,
+  Thumbs,
+  Virtual,
+} from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { IProductMediaType } from "../data";
 import { CustomNavigationButton } from "../stories/navigation";
+import "swiper/css/free-mode";
+import "swiper/css/navigation";
+import "swiper/css/thumbs";
+import "swiper/css/pagination";
 
 interface IProductGalleryModalProps {
   isOpen: boolean;
@@ -32,6 +43,7 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
   const [isEnd, setIsEnd] = React.useState(false);
   const [isPlaying, setPlaying] = useState(true);
   const [isMuted, setMuted] = useState(true);
+  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType>();
 
   const handlePlayPauseClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>): void => {
@@ -85,12 +97,12 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
   if (!isOpen || !mediaFiles?.length) return null;
 
   return (
-    <div className="fixed left-0 w-full z-100 flex items-end justify-center transition-all duration-300 ease-out animation-slideInUp top-0 h-screen">
+    <div className="absolute left-0 w-full z-100 flex items-end justify-center transition-all duration-300 ease-out animation-slideInUp top-0 h-screen">
       <div
         className="bg-white w-full transition-all duration-300 ease-out h-full rounded-none"
         ref={wrapperRef}
       >
-        <div className="relative cursor-pointer h-full">
+        <div className="relative cursor-pointer">
           <CustomNavigationButton
             direction="prev"
             onClick={handlePrevClick}
@@ -106,9 +118,9 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
             iconSize={16}
           />
           <Swiper
-            className="h-full"
             direction="horizontal"
-            modules={[Navigation, Pagination, Mousewheel, Virtual]}
+            thumbs={{ swiper: thumbsSwiper }}
+            modules={[Navigation, Pagination, Thumbs, Mousewheel, Virtual]}
             slidesPerView={1}
             virtual
             pagination
@@ -117,7 +129,7 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
             onSlideChange={handleSlideChange}
           >
             {mediaFiles.map((media, index) => (
-              <SwiperSlide key={index}>
+              <SwiperSlide key={index} className="m-auto">
                 {media.type === "video" ? (
                   <>
                     <div className="absolute top-4 left-4 flex flex-row gap-2 z-40">
@@ -152,6 +164,7 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
                       loop
                       className="w-full object-contain h-full"
                     />
+                    {/* <Product3DViewer src="./Astronaut.glb" /> */}
                   </>
                 ) : (
                   <img
@@ -163,6 +176,7 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
               </SwiperSlide>
             ))}
           </Swiper>
+
           <button
             onClick={handleCloseClick}
             className="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors text-xl cursor-pointer pointer-events-auto z-10"

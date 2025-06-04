@@ -9,6 +9,7 @@ import { VideoSlider } from "./carousels";
 import { VideoPopup } from "./popup";
 import { VIDEOS, type IVideo } from "./data";
 
+
 const App: FC = () => {
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
   const [currentVideoItem, setCurrentVideoItem] = useState<
