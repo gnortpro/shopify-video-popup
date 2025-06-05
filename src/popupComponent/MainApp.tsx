@@ -33,6 +33,7 @@ export const MainApp: FC<IMainAppProps> = ({ videos, onVideoChange }) => {
 
   const handleSlideChange = useCallback(
     (swiper: SwiperType) => {
+      console.log("1: ", 1);
       setCurrentVideoIndex(swiper.activeIndex);
       onVideoChange?.(videos[swiper.activeIndex]);
 
@@ -89,6 +90,10 @@ export const MainApp: FC<IMainAppProps> = ({ videos, onVideoChange }) => {
   }, [isOpenProductDetailModal]);
 
   useEffect(() => {
+    console.log("currentVideoIndex: ", currentVideoIndex);
+  }, [currentVideoIndex]);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!swiperRef.current) return;
 
@@ -98,6 +103,9 @@ export const MainApp: FC<IMainAppProps> = ({ videos, onVideoChange }) => {
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         handlePrev();
+      } else if (e.key.toLowerCase() === "m") {
+        e.preventDefault();
+        setIsMuted((prev) => !prev);
       }
     };
 
@@ -106,7 +114,7 @@ export const MainApp: FC<IMainAppProps> = ({ videos, onVideoChange }) => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleNext, handlePrev]);
+  }, [currentVideoIndex, handleNext, handlePrev]);
 
   return (
     <div className="bg-black text-white flex justify-center items-center relative h-screen">
@@ -132,8 +140,8 @@ export const MainApp: FC<IMainAppProps> = ({ videos, onVideoChange }) => {
                 video={video}
                 totalVideos={videos.length}
                 index={index}
+                currentVideoIndex={currentVideoIndex}
                 muted={isMuted}
-                playing={index === currentVideoIndex}
                 onRefReady={(i, el) => {
                   videoRefs.current[i] = el!;
                 }}

@@ -20,8 +20,8 @@ interface IVideoPlayerProps {
   video: IVideo;
   totalVideos: number;
   index: number;
+  currentVideoIndex: number;
   muted: boolean;
-  playing: boolean;
   onUnmute: (muted: boolean) => void;
   handleOpenCartModal: () => void;
   handleOpenProductDetailModal: () => void;
@@ -33,9 +33,9 @@ interface IVideoPlayerProps {
 export const VideoPlayer: FC<IVideoPlayerProps> = ({
   video,
   index,
+  currentVideoIndex,
   onUnmute,
   muted,
-  playing,
   onRefReady,
   handleOpenCartModal,
   handleOpenProductDetailModal,
@@ -45,9 +45,9 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const productModalRef = useRef<HTMLDivElement>(null);
 
-  const [isPlaying, setIsPlaying] = useState<boolean>(playing);
+  const [showPlayPauseIcon, setShowPlayPauseIcon] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [localProgress, setLocalProgress] = useState<number>(0);
-  const [showPlayPauseIcon, setShowPlayPauseIcon] = useState(false);
   // const [isOpenProductDetailModal, setOpenProductDetailModal] = useState(false);
   const [isShowFooter, setShowFooter] = useState(window.innerWidth >= 330);
 
@@ -88,7 +88,7 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
       setShowPlayPauseIcon(true);
       setIsPlaying(!isPlaying);
     },
-    [isPlaying],
+    [isPlaying, setShowPlayPauseIcon],
   );
 
   const handleProgressClick = useCallback(
@@ -148,14 +148,14 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
   }, [isPlaying]);
 
   useEffect(() => {
-    if (videoRef.current) {
+    if (videoRef.current && currentVideoIndex === index) {
       if (isPlaying) {
         videoRef.current.play().catch(console.error);
       } else {
         videoRef.current.pause();
       }
     }
-  }, [isPlaying]);
+  }, [currentVideoIndex, index, isPlaying]);
 
   useEffect(() => {
     if (showPlayPauseIcon) {
@@ -163,40 +163,45 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
         setShowPlayPauseIcon(false);
       }, 600);
     }
-  }, [showPlayPauseIcon]);
+  }, [setShowPlayPauseIcon, showPlayPauseIcon]);
 
   useEffect(() => {
     onRefReady(index, videoRef.current);
   }, [index, onRefReady]);
 
   useEffect(() => {
-    if (!videoRef.current) return;
-
-    const video = videoRef.current;
-
-    setIsPlaying(playing);
-    if (playing) {
-      const tryPlay = () => {
-        video.play().catch(() => {});
-      };
-
-      if (video.readyState >= 3) {
-        tryPlay();
-      } else {
-        video.addEventListener("canplay", tryPlay, { once: true });
+    if (currentVideoIndex !== index) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!videoRef.current) return;
+      const video = videoRef.current;
+      if (e.key === " " || e.code === "Space") {
+        e.preventDefault();
+        if (video) {
+          setShowPlayPauseIcon(true);
+          if (video.paused) {
+            setIsPlaying(true);
+            video.play().catch(() => {});
+          } else {
+            setIsPlaying(false);
+            video.pause();
+          }
+        }
       }
-    } else {
-      video.pause();
-      video.currentTime = 0;
-    }
-  }, [playing]);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [currentVideoIndex, index]);
 
   useEffect(() => {
     if (!videoRef.current) return;
-
     const video = videoRef.current;
 
-    if (playing) {
+    if (currentVideoIndex === index) {
+      setIsPlaying(true);
       const tryPlay = () => {
         video.play().catch(() => {});
       };
@@ -207,10 +212,11 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
         video.addEventListener("canplay", tryPlay, { once: true });
       }
     } else {
+      setIsPlaying(false);
       video.pause();
       video.currentTime = 0;
     }
-  }, [playing]);
+  }, [currentVideoIndex, index]);
 
   useEffect(() => {
     if (productModalRef.current) {
@@ -239,11 +245,11 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
       />
       {showPlayPauseIcon && (
         <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
-          <div className="w-20 h-20 bg-black/70 rounded-full flex items-center justify-center animate-ping">
+          <div className="w-10 h-10 md:w-20 md:h-20 bg-black/70 rounded-full flex items-center justify-center animate-ping">
             {isPlaying ? (
-              <Pause className="w-8 h-8 text-white" />
+              <Pause className="md:w-8 md:h-8 w-4 h-4 text-white" />
             ) : (
-              <Play className="w-8 h-8 text-white ml-1" />
+              <Play className="md:w-8 md:h-8 w-4 h-4 text-white ml-1" />
             )}
           </div>
         </div>
