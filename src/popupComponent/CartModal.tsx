@@ -7,8 +7,8 @@ interface ICartModalProps {
   isOpen: boolean;
   onClose: () => void;
   video: IVideo | null;
-  isMobile?: boolean;
   onOpenProductDetailModal: () => void;
+  width: number;
 }
 
 export const CartModal: FC<ICartModalProps> = ({
@@ -16,7 +16,7 @@ export const CartModal: FC<ICartModalProps> = ({
   onClose,
   video,
   onOpenProductDetailModal,
-  isMobile = false,
+  width,
 }) => {
   const handleBuyNow = useCallback((productId: number): void => {
     console.log("Buy now clicked for product:", productId);
@@ -39,10 +39,13 @@ export const CartModal: FC<ICartModalProps> = ({
 
   return (
     <div
-      className="fixed bottom-0 w-full z-50 flex items-center justify-center"
+      className="fixed left-0 bottom-0 w-full z-50 flex items-center justify-center"
       onClick={handleOverlayClick}
     >
-      <div className="bg-white rounded-t-xl w-full max-h-[80vh] overflow-hidden animate-slideInUp">
+      <div
+        style={{ width }}
+        className="bg-white rounded-t-xl w-full max-h-[80vh] overflow-hidden animate-slideInUp"
+      >
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <h3 className="text-lg font-semibold text-gray-900">
             Giỏ hàng ({video.products.length})
@@ -59,7 +62,6 @@ export const CartModal: FC<ICartModalProps> = ({
             <CartItem
               key={product.id}
               product={product}
-              isMobile={isMobile}
               onBuyNow={handleBuyNow}
               onOpenProductDetailModal={onOpenProductDetailModal}
             />

@@ -18,19 +18,18 @@ interface IProductDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   product: IProduct;
-  isMobile?: boolean;
+  width: number;
 }
 
 export const ProductDetailModal: FC<IProductDetailModalProps> = ({
   isOpen,
   onClose,
   product,
-  isMobile,
+  width,
 }) => {
   const localPlayState = localStorage.getItem("drv-video-state");
   const localSoundState = localStorage.getItem("drv-video-sound");
 
-  const wrapperRef = useRef<HTMLDivElement>(null);
   const swiperRef = useRef<SwiperType>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isBeginning, setIsBeginning] = React.useState(true);
@@ -151,38 +150,21 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
 
   return (
     <>
-      {!isFullScreen && (
-        <div
-          className="fixed inset-0 bg-[#000000c2] bg-opacity-50 z-40 transition-opacity duration-300"
-          onClick={handleOverlayClick}
-        />
-      )}
+      <div
+        className="fixed inset-0 bg-[#000000c2] bg-opacity-50 z-40 transition-opacity duration-300"
+        onClick={handleOverlayClick}
+      />
       <div
         className={cx(
-          "fixed left-0 w-full z-100 flex items-end justify-center transition-all duration-300 ease-out",
-          {
-            "top-0 h-screen": isFullScreen,
-            "bottom-0 h-[90vh] animation-slideInUp": !isFullScreen && isMobile,
-            "bottom-0 h-[90%] animation-slideInUp": !isFullScreen && !isMobile,
-          },
+          "fixed h-full m-auto top-0 animate-slideInUp left-0 w-full z-100 flex items-end justify-center transition-all",
         )}
         onClick={handleOverlayClick}
       >
         <div
-          className={cx(
-            "bg-white w-full transition-all duration-300 ease-out",
-            {
-              "h-full rounded-none": isFullScreen,
-              "h-full rounded-t-xl": !isFullScreen,
-            },
-            {
-              "overflow-y-auto overflow-x-hidden": isMobile,
-              "overflow-hidden": !isMobile,
-            },
-          )}
-          ref={wrapperRef}
+          className="bg-white h-full overflow-hidden w-full transition-all duration-300 ease-out"
           onScroll={handleScroll}
           onWheel={handleScroll}
+          style={{ width }}
         >
           <div className="relative cursor-pointer">
             <CustomNavigationButton
@@ -243,20 +225,14 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
                         autoPlay={isPlaying}
                         muted={isMuted}
                         loop
-                        className={cx("w-full object-contain", {
-                          "h-64": isMobile,
-                          "h-72": !isMobile,
-                        })}
+                        className={cx("w-full object-contain h-72 md:h-64")}
                       />
                     </>
                   ) : (
                     <img
                       src={media.url}
                       alt=""
-                      className={cx("w-full object-contain", {
-                        "h-64": isMobile,
-                        "h-72": !isMobile,
-                      })}
+                      className={cx("w-full object-contain h-72 md:h-64")}
                     />
                   )}
                 </SwiperSlide>
@@ -277,9 +253,9 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
           </div>
 
           <div
-            className={cx("bg-white px-4 py-4 pb-24", {
-              "max-h-[calc(100vh-550px)] overflow-y-auto": !isMobile,
-            })}
+            className={cx(
+              "bg-white px-4 py-4 pb-24 max-h-[calc(100%-270px)] overflow-y-auto",
+            )}
           >
             <div className="mb-3">
               <div className="flex items-center space-x-2 mb-1">

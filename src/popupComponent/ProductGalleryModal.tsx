@@ -153,7 +153,7 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
               <SwiperSlide key={index} className="m-auto">
                 {media.type === "video" ? (
                   <>
-                    <div className="absolute top-4 left-4 flex flex-row gap-2 z-40">
+                    <div className="absolute top-4 md:left-4 left-14 flex flex-row gap-2 z-40">
                       <button
                         onClick={handlePlayPauseClick}
                         className="control-button w-6 h-6 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
@@ -198,7 +198,7 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
           </Swiper>
           <button
             onClick={handleCloseClick}
-            className="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors text-xl cursor-pointer pointer-events-auto z-10"
+            className="absolute top-4 right-14 md:right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors text-xl cursor-pointer pointer-events-auto z-10"
           >
             <X className="text-gray-400 w-5 h-5" />
           </button>
@@ -257,7 +257,6 @@ export const ProductGalleryModal: FC<IProductGalleryModalProps> = ({
                       />
                     )}
 
-                    {/* Active indicator */}
                     {activeIndex === index && (
                       <div className="absolute inset-0 bg-blue-500/20 border border-blue-500 rounded-lg" />
                     )}

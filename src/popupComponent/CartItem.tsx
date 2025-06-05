@@ -5,13 +5,12 @@ import type { IProduct } from "../data";
 
 interface ICartItemProps {
   product: IProduct;
-  isMobile?: boolean;
   onOpenProductDetailModal: () => void;
   onBuyNow?: (productId: number) => void;
 }
 
 export const CartItem: FC<ICartItemProps> = React.memo(
-  ({ product, isMobile = false, onBuyNow, onOpenProductDetailModal }) => {
+  ({ product, onBuyNow, onOpenProductDetailModal }) => {
     const [quantity, setQuantity] = useState(0);
 
     const handleProductBuyClick = useCallback((): void => {
@@ -43,64 +42,46 @@ export const CartItem: FC<ICartItemProps> = React.memo(
     return (
       <div
         className={cx(
-          "bg-white w-full border border-gray-100 rounded-lg p-3 mb-3 shadow-sm hover:bg-gray-50 transition-colors",
-          {
-            "bg-gray-50 p-4 mb-4": !isMobile,
-          },
+          "bg-white w-full border border-gray-100 rounded-lg p-4 mb-4 md:p-3 md:mb-3 shadow-sm hover:bg-gray-50 transition-colors",
         )}
       >
         <div className="flex gap-3">
           <div className="relative flex-shrink-0 m-auto">
             <div
               className={cx(
-                "bg-gray-200 rounded-lg flex items-center justify-center",
-                {
-                  "w-20 h-20": isMobile,
-                  "w-24 h-24": !isMobile,
-                },
+                "bg-gray-200 w-20 h-20 md:w-24 md:h-24 rounded-lg flex items-center justify-center",
               )}
             >
               <ShoppingBag
-                className={cx("text-gray-400", {
-                  "w-8 h-8": isMobile,
-                  "w-10 h-10": !isMobile,
-                })}
+                className={cx("text-gray-400 w-8 h-8 md:w-10 md:h-10")}
               />
             </div>
           </div>
           <div className="flex-1 min-w-0">
             <h4
               onClick={openProductDetailModal}
-              className={cx("font-medium text-gray-900 mb-2 cursor-pointer", {
-                "text-sm leading-tight": isMobile,
-                "text-base mb-3": !isMobile,
-              })}
+              className={cx(
+                "font-medium text-sm leading-tight md:text-base md:leading-normal text-gray-900 mb-3 md:mb-2 cursor-pointer",
+              )}
             >
               <span className="line-clamp-2">{product.name}</span>
             </h4>
             <div
-              className={cx("flex items-center justify-between", {
-                "flex-col items-start gap-2": isMobile,
-              })}
+              className={cx(
+                "flex md:flex-row md:items-center justify-between flex-col items-start  gap-2",
+              )}
             >
-              <div
-                className={cx("flex items-center gap-2 flex-wrap", {
-                  "gap-3": !isMobile,
-                })}
-              >
+              <div className={cx("flex items-center gap-3 md:gap-2 flex-wrap")}>
                 <span
-                  className={cx("font-bold text-red-600 whitespace-nowrap", {
-                    "text-lg": isMobile,
-                    "text-xl": !isMobile,
-                  })}
+                  className={cx(
+                    "font-bold text-red-600 text-lg md:text-xl whitespace-nowrap",
+                  )}
                 >
                   ₫{product.price}
                 </span>
                 {product.originalPrice && (
                   <span className="text-sm text-gray-400 line-through whitespace-nowrap">
-                    {isMobile
-                      ? product.originalPrice
-                      : `₫${product.originalPrice}`}
+                    {`₫${product.originalPrice}`}
                   </span>
                 )}
                 {product.discount && (
@@ -110,7 +91,7 @@ export const CartItem: FC<ICartItemProps> = React.memo(
                 )}
               </div>
             </div>
-            <div className="flex gap-2 mt-2">
+            <div className="flex gap-2 mt-2 flex-col md:flex-row">
               <div className="flex w-fit items-center rounded-lg bg-gray-50 border border-gray-200 shadow-sm">
                 <button
                   onClick={decreaseQuantity}
@@ -146,7 +127,7 @@ export const CartItem: FC<ICartItemProps> = React.memo(
               </div>
               <button
                 onClick={handleProductBuyClick}
-                className="bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors whitespace-nowrap flex-shrink-0 cursor-pointer w-fit px-6 py-2"
+                className="w-full bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors whitespace-nowrap flex-shrink-0 cursor-pointer w-fit px-6 py-2"
               >
                 Cập nhật
               </button>

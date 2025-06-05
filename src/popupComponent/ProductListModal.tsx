@@ -3,20 +3,20 @@ import { X } from "lucide-react";
 import { ProductItem } from "./ProductItem";
 import type { IVideo, IProduct } from "../data";
 
-interface IProductModalProps {
+interface IProductListModalProps {
   isOpen: boolean;
   onClose: () => void;
   openProductDetailModal: () => void;
   video: IVideo | null;
-  isMobile?: boolean;
+  width: number;
 }
 
-export const ProductModal: FC<IProductModalProps> = ({
+export const ProductListModal: FC<IProductListModalProps> = ({
   isOpen,
   onClose,
   video,
   openProductDetailModal,
-  isMobile = false,
+  width,
 }) => {
   const handleBuyNow = useCallback((productId: number): void => {
     console.log("Buy now clicked for product:", productId);
@@ -31,10 +31,6 @@ export const ProductModal: FC<IProductModalProps> = ({
     [onClose],
   );
 
-  const handleOpenProductDetailModal = useCallback((): void => {
-    openProductDetailModal();
-  }, [openProductDetailModal]);
-
   const handleCloseClick = useCallback((): void => {
     onClose();
   }, [onClose]);
@@ -43,10 +39,13 @@ export const ProductModal: FC<IProductModalProps> = ({
 
   return (
     <div
-      className="fixed bottom-0 w-full z-50 flex items-center justify-center"
+      className="absolute px-10 m-auto md:px-0 bottom-0 left-0 w-full z-50 flex items-center justify-center"
       onClick={handleOverlayClick}
     >
-      <div className="bg-white rounded-t-xl w-full max-h-[80vh] overflow-hidden animate-slideInUp">
+      <div
+        style={{ width }}
+        className="bg-white rounded-t-xl w-full max-h-[80vh] overflow-hidden animate-slideInUp"
+      >
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <h3 className="text-lg font-semibold text-gray-900">
             Sản phẩm trong video ({video.products.length})
@@ -63,9 +62,8 @@ export const ProductModal: FC<IProductModalProps> = ({
             <ProductItem
               key={product.id}
               product={product}
-              isMobile={isMobile}
               onBuyNow={handleBuyNow}
-              onOpenProductDetailModal={handleOpenProductDetailModal}
+              onOpenProductDetailModal={openProductDetailModal}
             />
           ))}
         </div>

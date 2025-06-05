@@ -1,67 +1,61 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-  type FC,
-} from "react";
 import {
-  Play,
   Pause,
-  Volume2,
-  VolumeX,
+  Play,
   ShoppingBag,
   ShoppingCart,
-  X,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
-import cx from "classnames";
-import { ProductModal } from "./ProductModal";
-import { ProductItem } from "./ProductItem";
-import { CartModal } from "./CartModal";
-import { ProductDetailModal } from "./ProductDetailModal";
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FC,
+} from "react";
 import { type IVideo } from "../data";
+import { ProductItem } from "./ProductItem";
 
 interface IVideoPlayerProps {
   video: IVideo;
   totalVideos: number;
-  progress: number;
-  isPlaying: boolean;
-  isMuted: boolean;
-  onScreenClick: () => void;
-  onPlayPause: () => void;
-  onMute: () => void;
-  // onPrevVideo: () => void;
-  // onNextVideo: () => void;
-  formatTime: (seconds: number) => string;
-  isMobile?: boolean;
-  onProgressUpdate?: (progress: number) => void;
-  hideNavigation?: (value: boolean) => void;
-  onHideModal?: () => void;
+  index: number;
+  muted: boolean;
+  playing: boolean;
+  onUnmute: (muted: boolean) => void;
+  handleOpenCartModal: () => void;
+  handleOpenProductDetailModal: () => void;
+  handleOpenProductListModal: () => void;
+  onRefReady: (index: number, element: HTMLVideoElement | null) => void;
+  handleVideoWrapperWidth: (width: number) => void;
 }
 
 export const VideoPlayer: FC<IVideoPlayerProps> = ({
   video,
-  isPlaying,
-  isMuted,
-  onScreenClick,
-  onPlayPause,
-  onMute,
-  isMobile = false,
-  onProgressUpdate,
-  onHideModal,
-  hideNavigation,
+  index,
+  onUnmute,
+  muted,
+  playing,
+  onRefReady,
+  handleOpenCartModal,
+  handleOpenProductDetailModal,
+  handleOpenProductListModal,
+  handleVideoWrapperWidth,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const productModalRef = useRef<HTMLDivElement>(null);
+
+  const [isPlaying, setIsPlaying] = useState<boolean>(playing);
   const [localProgress, setLocalProgress] = useState<number>(0);
-  const [isOpenProductModal, setOpenProductModal] = useState(false);
-  const [isOpenCartModal, setOpenCartModal] = useState(false);
   const [showPlayPauseIcon, setShowPlayPauseIcon] = useState(false);
-  const [isOpenProductDetailModal, setOpenProductDetailModal] = useState(false);
+  // const [isOpenProductDetailModal, setOpenProductDetailModal] = useState(false);
   const [isShowFooter, setShowFooter] = useState(window.innerWidth >= 330);
 
   const handleResize = useCallback((): void => {
+    if (productModalRef.current)
+      handleVideoWrapperWidth(productModalRef.current?.clientWidth);
     setShowFooter(window.innerWidth >= 330);
-  }, []);
+  }, [handleVideoWrapperWidth]);
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
@@ -75,10 +69,9 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
       if (duration) {
         const progressPercent = (currentTime / duration) * 100;
         setLocalProgress(progressPercent);
-        onProgressUpdate?.(progressPercent);
       }
     }
-  }, [onProgressUpdate]);
+  }, []);
 
   const handleVideoAreaClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>): void => {
@@ -93,9 +86,9 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
         return;
       }
       setShowPlayPauseIcon(true);
-      onPlayPause();
+      setIsPlaying(!isPlaying);
     },
-    [onPlayPause],
+    [isPlaying],
   );
 
   const handleProgressClick = useCallback(
@@ -109,48 +102,43 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
         const newTime = (clickProgress / 100) * videoRef.current.duration;
         videoRef.current.currentTime = newTime;
         setLocalProgress(clickProgress);
-        onProgressUpdate?.(clickProgress);
       }
     },
-    [onProgressUpdate],
+    [],
   );
 
   const handlePlayPauseClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>): void => {
       e.stopPropagation();
-      onPlayPause();
+      setIsPlaying(!isPlaying);
     },
-    [onPlayPause],
+    [isPlaying],
   );
 
   const handleMuteClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>): void => {
       e.stopPropagation();
-      onMute();
+      onUnmute(!muted);
     },
-    [onMute],
+    [muted, onUnmute],
   );
-
-  const handleVideoClick = useCallback((): void => {
-    onScreenClick();
-  }, [onScreenClick]);
 
   const handleBuyNow = useCallback((): void => {}, []);
 
   const handleCartModalClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>): void => {
       e.stopPropagation();
-      setOpenCartModal(true);
+      handleOpenCartModal();
     },
-    [],
+    [handleOpenCartModal],
   );
 
-  const handleProductModalClick = useCallback(
+  const handleProductListModalClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>): void => {
       e.stopPropagation();
-      setOpenProductModal(true);
+      handleOpenProductListModal();
     },
-    [],
+    [handleOpenProductListModal],
   );
 
   const handleVideoLoadedData = useCallback((): void => {
@@ -178,23 +166,62 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
   }, [showPlayPauseIcon]);
 
   useEffect(() => {
-    if (hideNavigation)
-      hideNavigation(
-        isOpenProductDetailModal || isOpenProductModal || isOpenCartModal,
-      );
-  }, [
-    isOpenProductDetailModal,
-    isOpenProductModal,
-    isOpenCartModal,
-    hideNavigation,
-  ]);
+    onRefReady(index, videoRef.current);
+  }, [index, onRefReady]);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const video = videoRef.current;
+
+    setIsPlaying(playing);
+    if (playing) {
+      const tryPlay = () => {
+        video.play().catch(() => {});
+      };
+
+      if (video.readyState >= 3) {
+        tryPlay();
+      } else {
+        video.addEventListener("canplay", tryPlay, { once: true });
+      }
+    } else {
+      video.pause();
+      video.currentTime = 0;
+    }
+  }, [playing]);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const video = videoRef.current;
+
+    if (playing) {
+      const tryPlay = () => {
+        video.play().catch(() => {});
+      };
+
+      if (video.readyState >= 3) {
+        tryPlay();
+      } else {
+        video.addEventListener("canplay", tryPlay, { once: true });
+      }
+    } else {
+      video.pause();
+      video.currentTime = 0;
+    }
+  }, [playing]);
+
+  useEffect(() => {
+    if (productModalRef.current) {
+      handleVideoWrapperWidth(productModalRef.current.clientWidth);
+    }
+  }, [handleVideoWrapperWidth, productModalRef]);
 
   return (
     <div
-      className={cx("relative bg-black overflow-hidden aspect-[9/16]", {
-        "h-[80vh] w-auto rounded-xl group": !isMobile,
-        "w-full h-full": isMobile,
-      })}
+      ref={productModalRef}
+      className="relative bg-black overflow-hidden aspect-[9/16] w-full h-full"
     >
       <video
         ref={videoRef}
@@ -202,7 +229,7 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
         className="w-full h-full object-contain"
         loop
         playsInline
-        muted={isMuted}
+        muted={muted}
         onTimeUpdate={handleTimeUpdate}
         onLoadedData={handleVideoLoadedData}
       />
@@ -221,44 +248,39 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
           </div>
         </div>
       )}
-      <div className="absolute top-4 left-4 flex flex-row gap-2 z-40">
-        <button
-          onClick={handlePlayPauseClick}
-          className="control-button w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
-          title={isPlaying ? "Pause" : "Play"}
-        >
-          {isPlaying ? (
-            <Pause className="w-5 h-5 text-white" />
-          ) : (
-            <Play className="w-5 h-5 text-white ml-0.5" />
-          )}
-        </button>
-        <div className="relative group/volume control-button">
+      <div className="absolute top-4 left-0 flex justify-between md:px-6 pl-16 pr-28 w-full z-40">
+        <div className="flex gap-2 items-center">
           <button
-            onClick={handleMuteClick}
-            className="w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
-            title={isMuted ? "Unmute" : "Mute"}
+            onClick={handlePlayPauseClick}
+            className="control-button w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
+            title={isPlaying ? "Pause" : "Play"}
           >
-            {isMuted ? (
-              <VolumeX className="w-5 h-5 text-white" />
+            {isPlaying ? (
+              <Pause className="w-5 h-5 text-white" />
             ) : (
-              <Volume2 className="w-5 h-5 text-white" />
+              <Play className="w-5 h-5 text-white ml-0.5" />
             )}
           </button>
+          <div className="relative group/volume control-button">
+            <button
+              onClick={handleMuteClick}
+              className="w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
+              title={muted ? "Unmute" : "Mute"}
+            >
+              {muted ? (
+                <VolumeX className="w-5 h-5 text-white" />
+              ) : (
+                <Volume2 className="w-5 h-5 text-white" />
+              )}
+            </button>
+          </div>
         </div>
-      </div>
-
-      <div
-        className={cx("absolute top-4 right-4 z-40 flex", {
-          "gap-2": video.products.length > 0,
-        })}
-      >
         <button
           onClick={handleCartModalClick}
-          className="relative w-12 h-12 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
+          className="relative w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer"
           title={`Xem sản phẩm (${video.products.length})`}
         >
-          <ShoppingCart className="w-6 h-6 text-orange-500" />
+          <ShoppingCart className="w-5 h-5 text-orange-500" />
           {video.products.length > 0 && (
             <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">
@@ -267,25 +289,13 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
             </div>
           )}
         </button>
-        {isMobile && (
-          <button
-            onClick={onHideModal}
-            className={cx(
-              "w-6 h-6 text-white cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors duration-200",
-              {
-                "mt-3": video.products.length > 0,
-              },
-            )}
-          >
-            <X size={16} className="text-gray-600" />
-          </button>
-        )}
       </div>
+
       {isShowFooter && (
-        <div className="absolute bottom-0 left-0 p-4 right-0 pointer-events-none flex items-center gap-6 z-50">
+        <div className="absolute bottom-0 left-0 p-4 pointer-events-none flex items-center gap-6 z-50 w-full px-16 md:px-4">
           <button
             className="relative p-4 bg-white/10 hover:bg-white/10 rounded-full flex items-center justify-center hover:scale-110 cursor-pointer pointer-events-auto"
-            onClick={handleProductModalClick}
+            onClick={handleProductListModalClick}
           >
             <ShoppingBag size="30" className="text-orange-500" />
             {video.products.length > 0 && (
@@ -298,9 +308,8 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
           </button>
           <ProductItem
             product={video.products[0]}
-            isMobile={isMobile}
             onBuyNow={handleBuyNow}
-            onOpenProductDetailModal={() => setOpenProductDetailModal(true)}
+            onOpenProductDetailModal={handleOpenProductDetailModal}
           />
         </div>
       )}
@@ -323,26 +332,11 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
           </div>
         </div>
       )}
-      <ProductDetailModal
+      {/* <ProductDetailModal
         isOpen={isOpenProductDetailModal}
         onClose={() => setOpenProductDetailModal(false)}
         product={video.products[0]}
-        isMobile={isMobile}
-      />
-      <ProductModal
-        isOpen={isOpenProductModal}
-        onClose={() => setOpenProductModal(false)}
-        video={video}
-        openProductDetailModal={() => setOpenProductDetailModal(true)}
-        isMobile={isMobile}
-      />
-      <CartModal
-        isOpen={isOpenCartModal}
-        onClose={() => setOpenCartModal(false)}
-        video={video}
-        isMobile={isMobile}
-        onOpenProductDetailModal={() => setOpenProductDetailModal(true)}
-      />
+      /> */}
     </div>
   );
 };

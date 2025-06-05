@@ -37,7 +37,7 @@
 }
 
 .animate-slideInUp {
-  animation: slideInUp 650ms ease-in-out;
+  animation: slideInUp 200ms ease-in-out;
 }
 
 

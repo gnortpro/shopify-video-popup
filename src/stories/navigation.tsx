@@ -31,8 +31,8 @@ export const CustomNavigationButton: FC<ICustomNavigationButtonProps> = ({
       className={cx(
         "absolute top-1/2 transform -translate-y-1/2 z-10  bg-white rounded-full shadow-md flex items-center justify-center hover:shadow-lg cursor-pointer transition-shadow",
         {
-          "left-8 -translate-x-1 sm:-translate-x-2": direction === "prev",
-          "right-8 translate-x-1 sm:translate-x-2": direction === "next",
+          "left-14 md:left-8 -translate-x-1 sm:-translate-x-2": direction === "prev",
+          "right-14 md:right-8 translate-x-1 sm:translate-x-2": direction === "next",
           "w-6.5 h-6.5": size === "small",
           "w-10 h-10": size === "medium",
           "w-14 h-14": size === "large",
