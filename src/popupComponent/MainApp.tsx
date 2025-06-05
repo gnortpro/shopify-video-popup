@@ -88,6 +88,26 @@ export const MainApp: FC<IMainAppProps> = ({ videos, onVideoChange }) => {
     }
   }, [isOpenProductDetailModal]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!swiperRef.current) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        handleNext();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        handlePrev();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleNext, handlePrev]);
+
   return (
     <div className="bg-black text-white flex justify-center items-center relative h-screen">
       <div className="relative w-full h-full">
