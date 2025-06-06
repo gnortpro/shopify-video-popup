@@ -125,12 +125,14 @@ export const CartItem: FC<ICartItemProps> = React.memo(
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
-              <button
-                onClick={handleProductBuyClick}
-                className="w-full bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors whitespace-nowrap flex-shrink-0 cursor-pointer w-fit px-6 py-2"
-              >
-                Cập nhật
-              </button>
+              <div className="w-fit">
+                <button
+                  onClick={handleProductBuyClick}
+                  className="bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors whitespace-nowrap flex-shrink-0 cursor-pointer w-fit px-6 py-2"
+                >
+                  Cập nhật
+                </button>
+              </div>
             </div>
           </div>
         </div>

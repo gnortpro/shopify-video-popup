@@ -17,11 +17,15 @@ import { CartModal } from "./CartModal";
 
 interface IMainAppProps {
   videos: IVideo[];
-  currentVideoItem: IVideo;
+  initCurrentVideoIndex?: number;
   onVideoChange?: (currentVideoItem: IVideo) => void;
 }
 
-export const MainApp: FC<IMainAppProps> = ({ videos, onVideoChange }) => {
+export const MainApp: FC<IMainAppProps> = ({
+  videos,
+  initCurrentVideoIndex,
+  onVideoChange,
+}) => {
   const swiperRef = useRef<SwiperType | null>(null);
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
@@ -31,9 +35,11 @@ export const MainApp: FC<IMainAppProps> = ({ videos, onVideoChange }) => {
   const [isOpenCartModal, setOpenCartModal] = useState(false);
   const [videoWrapperWidth, setVideoWrapperWidth] = useState(0);
 
+  const shouldBlockInteractVideo =
+    isOpenProductDetailModal || isOpenProductListModal || isOpenCartModal;
+
   const handleSlideChange = useCallback(
     (swiper: SwiperType) => {
-      console.log("1: ", 1);
       setCurrentVideoIndex(swiper.activeIndex);
       onVideoChange?.(videos[swiper.activeIndex]);
 
@@ -82,16 +88,12 @@ export const MainApp: FC<IMainAppProps> = ({ videos, onVideoChange }) => {
   useEffect(() => {
     if (!swiperRef.current) return;
 
-    if (isOpenProductDetailModal) {
+    if (shouldBlockInteractVideo) {
       swiperRef.current.mousewheel.disable();
     } else {
       swiperRef.current.mousewheel.enable();
     }
-  }, [isOpenProductDetailModal]);
-
-  useEffect(() => {
-    console.log("currentVideoIndex: ", currentVideoIndex);
-  }, [currentVideoIndex]);
+  }, [shouldBlockInteractVideo]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -115,6 +117,16 @@ export const MainApp: FC<IMainAppProps> = ({ videos, onVideoChange }) => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [currentVideoIndex, handleNext, handlePrev]);
+
+  useEffect(() => {
+    if (
+      !!initCurrentVideoIndex &&
+      initCurrentVideoIndex >= 0 &&
+      !!swiperRef.current
+    ) {
+      swiperRef.current.slideTo(initCurrentVideoIndex);
+    }
+  }, [initCurrentVideoIndex]);
 
   return (
     <div className="bg-black text-white flex justify-center items-center relative h-screen">
@@ -148,6 +160,7 @@ export const MainApp: FC<IMainAppProps> = ({ videos, onVideoChange }) => {
                 handleOpenProductDetailModal={() =>
                   setOpenProductDetailModal(true)
                 }
+                isOpenProductDetailModal={isOpenProductDetailModal}
                 handleOpenProductListModal={() => setOpenProductListModal(true)}
                 handleOpenCartModal={() => setOpenCartModal(true)}
                 handleVideoWrapperWidth={setVideoWrapperWidth}
@@ -178,7 +191,7 @@ export const MainApp: FC<IMainAppProps> = ({ videos, onVideoChange }) => {
           width={videoWrapperWidth}
         />
 
-        {!isOpenProductDetailModal && (
+        {!shouldBlockInteractVideo && (
           <div className="absolute -right-20 top-1/2 -translate-y-1/2 flex flex-col gap-4">
             <button
               onClick={handlePrev}

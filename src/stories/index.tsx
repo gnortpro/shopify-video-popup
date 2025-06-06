@@ -20,7 +20,6 @@ export const VideoStories: FC<IStoriesCarouselProps> = ({
 
   const handleStoryClick = useCallback(
     (story: IVideo): void => {
-      console.log("Story clicked:", story.title);
       onStoryClick?.(story.id);
     },
     [onStoryClick],

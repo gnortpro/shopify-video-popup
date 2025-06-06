@@ -1,35 +1,40 @@
-import React, { useState, useEffect, useCallback, type FC } from "react";
-import Modal from "react-modal";
-import { X } from "lucide-react";
 import cx from "classnames";
+import { X } from "lucide-react";
+import { useCallback, useEffect, useState, type FC } from "react";
+import Modal from "react-modal";
+import { VideoSlider } from "./carousels";
+import { VIDEOS, type IVideo } from "./data";
+import { VideoPopup } from "./popup";
 import { MainApp } from "./popupComponent/MainApp";
 import { VideoStories } from "./stories";
-import { VideoSlider } from "./carousels";
-import { VideoPopup } from "./popup";
-import { VIDEOS, type IVideo } from "./data";
 
 const App: FC = () => {
-  const [currentVideoItem, setCurrentVideoItem] = useState<
-    IVideo | undefined
+  const [currentVideoItemId, setCurrentVideoItemId] = useState<
+    number | undefined
   >();
+  const [initVideoItemIndex, setInitVideoItemIndex] = useState<number>(-1);
 
   const handleVideoChange = useCallback((video: IVideo) => {
-    setCurrentVideoItem(video);
+    setCurrentVideoItemId(video.id);
   }, []);
 
   const handleStoryClick = useCallback((id: number) => {
-    setCurrentVideoItem(
-      VIDEOS.find((video) => video.id === Number(id)) || VIDEOS[0],
-    );
+    const findIndex = VIDEOS.findIndex((video) => video.id === id);
+    setInitVideoItemIndex(findIndex);
   }, []);
 
   const onHideModal = useCallback(() => {
-    setCurrentVideoItem(undefined);
+    setCurrentVideoItemId(undefined);
+    setInitVideoItemIndex(-1);
   }, []);
 
-  const handleVideoPopupClick = useCallback(() => {
-    handleStoryClick(1);
-  }, [handleStoryClick]);
+  const handleVideoPopupClick = useCallback(
+    (id: number) => {
+      const findIndex = VIDEOS.findIndex((video) => video.id === id);
+      setInitVideoItemIndex(findIndex);
+    },
+    [setInitVideoItemIndex],
+  );
 
   const handleCloseModal = useCallback(() => {
     onHideModal();
@@ -43,8 +48,8 @@ const App: FC = () => {
       <div className="bg-white overflow-hidden mb-8">
         <VideoSlider onSlideClick={handleStoryClick} />
       </div>
-      <VideoPopup onVideoClick={handleVideoPopupClick} />
-      {currentVideoItem && (
+      <VideoPopup onVideoClick={handleVideoPopupClick} video={VIDEOS[0]} />
+      {(currentVideoItemId || initVideoItemIndex >= 0) && (
         <Modal
           isOpen
           onRequestClose={onHideModal}
@@ -65,7 +70,7 @@ const App: FC = () => {
           <MainApp
             videos={VIDEOS}
             onVideoChange={handleVideoChange}
-            currentVideoItem={currentVideoItem}
+            initCurrentVideoIndex={initVideoItemIndex}
           />
         </Modal>
       )}

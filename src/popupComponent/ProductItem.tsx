@@ -29,10 +29,7 @@ export const ProductItem: FC<IProductItemProps> = React.memo(
           <div className="relative flex-shrink-0 m-auto">
             <div
               className={cx(
-                "bg-gray-200 rounded-lg flex items-center justify-center",
-                {
-                  "w-16 h-16": true,
-                },
+                "bg-gray-200 rounded-lg flex items-center justify-center w-16 h-16",
               )}
             >
               <ShoppingBag
@@ -51,7 +48,7 @@ export const ProductItem: FC<IProductItemProps> = React.memo(
             </h4>
             <div
               className={cx(
-                "flex md:items-center justify-between flex-col md:flex-row items-start gap-2",
+                "flex md:items-center justify-between md:justify-start flex-col md:flex-row items-start gap-2 md:gap-4",
               )}
             >
               <div className={cx("flex items-center gap-1 flex-wrap")}>
@@ -73,7 +70,7 @@ export const ProductItem: FC<IProductItemProps> = React.memo(
                   </span>
                 )}
               </div>
-              <div className="w-full">
+              <div className="w-fit">
                 <button
                   onClick={handleProductBuyClick}
                   className={cx(

@@ -1,10 +1,11 @@
-import { Pause, Play, ShoppingCart, Volume2, VolumeX, X } from "lucide-react";
+import { Pause, Play, ShoppingCart, Volume2, VolumeX, X, Minus, Plus } from "lucide-react";
 import React, {
   useCallback,
   useRef,
   useEffect,
   useState,
   type FC,
+  type ChangeEvent,
 } from "react";
 import cx from "classnames";
 import type { IProduct, IProductMediaType } from "../data";
@@ -20,6 +21,23 @@ interface IProductDetailModalProps {
   product: IProduct;
   width: number;
 }
+
+// Mock variant data - you can replace this with actual data from your product
+const PRODUCT_VARIANTS = {
+  colors: [
+    { id: 'red', name: 'Đỏ', value: '#ef4444' },
+    { id: 'blue', name: 'Xanh dương', value: '#3b82f6' },
+    { id: 'green', name: 'Xanh lá', value: '#10b981' },
+    { id: 'black', name: 'Đen', value: '#000000' },
+  ],
+  sizes: [
+    { id: 'xs', name: 'XS' },
+    { id: 's', name: 'S' },
+    { id: 'm', name: 'M' },
+    { id: 'l', name: 'L' },
+    { id: 'xl', name: 'XL' },
+  ]
+};
 
 export const ProductDetailModal: FC<IProductDetailModalProps> = ({
   isOpen,
@@ -45,6 +63,11 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
   const [mediaModalFiles, setMediaModalFiles] = useState<IProductMediaType[]>(
     [],
   );
+
+  // New state for variants and quantity
+  const [selectedColor, setSelectedColor] = useState(PRODUCT_VARIANTS.colors[0].id);
+  const [selectedSize, setSelectedSize] = useState(PRODUCT_VARIANTS.sizes[2].id); // Default to M
+  const [quantity, setQuantity] = useState(1);
 
   const handlePlayPauseClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>): void => {
@@ -79,7 +102,14 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
     [onClose],
   );
 
-  const onAddToCart = useCallback((): void => {}, []);
+  const onAddToCart = useCallback((): void => {
+    console.log('Add to cart:', {
+      productId: product.id,
+      color: selectedColor,
+      size: selectedSize,
+      quantity
+    });
+  }, [product.id, selectedColor, selectedSize, quantity]);
 
   const handleCloseClick = useCallback((): void => {
     onClose();
@@ -129,6 +159,35 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
     },
     [product.mediaFiles],
   );
+
+  // Quantity handlers
+  const decreaseQuantity = useCallback((): void => {
+    setQuantity((current) => Math.max(1, current - 1));
+  }, []);
+
+  const increaseQuantity = useCallback((): void => {
+    setQuantity((current) => Math.min(999, current + 1));
+  }, []);
+
+  const handleQuantityChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>): void => {
+      const value = parseInt(e.target.value) || 1;
+      if (value >= 1 && value <= 999) {
+        setQuantity(value);
+      }
+    },
+    [],
+  );
+
+  // Color selection handler
+  const handleColorSelect = useCallback((colorId: string): void => {
+    setSelectedColor(colorId);
+  }, []);
+
+  // Size selection handler
+  const handleSizeSelect = useCallback((sizeId: string): void => {
+    setSelectedSize(sizeId);
+  }, []);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -257,7 +316,13 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
               "bg-white px-4 py-4 pb-24 max-h-[calc(100%-270px)] overflow-y-auto",
             )}
           >
-            <div className="mb-3">
+            {/* 1. Title */}
+            <h1 className="text-lg font-medium text-gray-800 mb-3 leading-tight">
+              {product.name}
+            </h1>
+
+            {/* 2. Price */}
+            <div className="mb-4">
               <div className="flex items-center space-x-2 mb-1">
                 <span className="text-2xl font-bold text-orange-500">
                   ₫{product.price}
@@ -275,85 +340,104 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
               </div>
             </div>
 
-            <h1 className="text-lg font-medium text-gray-800 mb-3 leading-tight">
-              {product.name}
-            </h1>
+            {/* 3. Variants Picker */}
+            <div className="mb-6 space-y-4">
+              {/* Color Picker */}
+              <div>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">
+                  Màu sắc: <span className="text-gray-900">{PRODUCT_VARIANTS.colors.find(c => c.id === selectedColor)?.name}</span>
+                </h3>
+                <div className="flex gap-2 flex-wrap">
+                  {PRODUCT_VARIANTS.colors.map((color) => (
+                    <button
+                      key={color.id}
+                      onClick={() => handleColorSelect(color.id)}
+                      className={cx(
+                        "w-8 h-8 rounded-full border-2 transition-all duration-200 hover:scale-110",
+                        {
+                          "border-gray-800 shadow-md": selectedColor === color.id,
+                          "border-gray-300": selectedColor !== color.id,
+                        }
+                      )}
+                      style={{ backgroundColor: color.value }}
+                      title={color.name}
+                    />
+                  ))}
+                </div>
+              </div>
 
+              {/* Size Picker */}
+              <div>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">
+                  Kích thước: <span className="text-gray-900">{PRODUCT_VARIANTS.sizes.find(s => s.id === selectedSize)?.name}</span>
+                </h3>
+                <div className="flex gap-2 flex-wrap">
+                  {PRODUCT_VARIANTS.sizes.map((size) => (
+                    <button
+                      key={size.id}
+                      onClick={() => handleSizeSelect(size.id)}
+                      className={cx(
+                        "px-3 py-2 border rounded-md text-sm font-medium transition-all duration-200",
+                        {
+                          "border-orange-500 bg-orange-50 text-orange-700": selectedSize === size.id,
+                          "border-gray-300 bg-white text-gray-700 hover:border-gray-400": selectedSize !== size.id,
+                        }
+                      )}
+                    >
+                      {size.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Quantity */}
+            <div className="mb-6">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Số lượng</h3>
+              <div className="flex w-fit items-center rounded-lg bg-gray-50 border border-gray-200 shadow-sm">
+                <button
+                  onClick={decreaseQuantity}
+                  disabled={quantity <= 1}
+                  className={cx(
+                    "w-10 h-10 flex items-center justify-center transition-all duration-200 cursor-pointer rounded-l-lg",
+                    {
+                      "text-gray-400 cursor-not-allowed": quantity <= 1,
+                      "text-gray-600 hover:bg-orange-50 hover:text-orange-500 active:bg-orange-100":
+                        quantity > 1,
+                    },
+                  )}
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <div className="flex items-center justify-center border-x border-gray-200">
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={handleQuantityChange}
+                    min="1"
+                    max="999"
+                    className="w-16 h-10 text-center font-medium text-gray-800 text-lg bg-transparent border-none outline-none appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                  />
+                </div>
+                <button
+                  onClick={increaseQuantity}
+                  disabled={quantity >= 999}
+                  className={cx(
+                    "w-10 h-10 flex items-center justify-center transition-all duration-200 cursor-pointer rounded-r-lg",
+                    {
+                      "text-gray-400 cursor-not-allowed": quantity >= 999,
+                      "text-gray-600 hover:bg-orange-50 hover:text-orange-500 active:bg-orange-100":
+                        quantity < 999,
+                    },
+                  )}
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* 5. Description */}
             <div className="space-y-4 text-gray-600">
-              <p>
-                Discover the perfect blend of style and functionality with our
-                featured product. Crafted with premium materials, this item is
-                designed to elevate your everyday experience. Whether you're
-                looking for durability, comfort, or a touch of elegance, this
-                product delivers on all fronts.
-              </p>
-              <p>
-                Its sleek design seamlessly fits into any setting, making it a
-                versatile addition to your collection. Enjoy the benefits of
-                advanced technology and thoughtful engineering, ensuring
-                long-lasting performance and reliability.
-              </p>
-              <p>
-                The product's intuitive features make it easy to use, while its
-                robust construction guarantees it will stand the test of time.
-                Ideal for both personal use and gifting, it's a choice that
-                brings satisfaction to every customer.
-              </p>
-              <p>
-                Our commitment to quality means you can shop with confidence,
-                knowing that each detail has been carefully considered. From the
-                smooth finish to the ergonomic design, every aspect is tailored
-                to meet your needs.
-              </p>
-              <p>
-                Experience the difference that superior craftsmanship makes, and
-                see why this product is a favorite among our customers. Don't
-                miss out on this opportunity to own a product that combines
-                innovation with classic appeal.
-              </p>
-              <p>
-                Order now and take the first step toward enhancing your
-                lifestyle with a product you'll love to use every day. Join
-                thousands of satisfied customers who have made this their go-to
-                choice.
-              </p>
-              <p>
-                Discover the perfect blend of style and functionality with our
-                featured product. Crafted with premium materials, this item is
-                designed to elevate your everyday experience. Whether you're
-                looking for durability, comfort, or a touch of elegance, this
-                product delivers on all fronts.
-              </p>
-              <p>
-                Its sleek design seamlessly fits into any setting, making it a
-                versatile addition to your collection. Enjoy the benefits of
-                advanced technology and thoughtful engineering, ensuring
-                long-lasting performance and reliability.
-              </p>
-              <p>
-                The product's intuitive features make it easy to use, while its
-                robust construction guarantees it will stand the test of time.
-                Ideal for both personal use and gifting, it's a choice that
-                brings satisfaction to every customer.
-              </p>
-              <p>
-                Our commitment to quality means you can shop with confidence,
-                knowing that each detail has been carefully considered. From the
-                smooth finish to the ergonomic design, every aspect is tailored
-                to meet your needs.
-              </p>
-              <p>
-                Experience the difference that superior craftsmanship makes, and
-                see why this product is a favorite among our customers. Don't
-                miss out on this opportunity to own a product that combines
-                innovation with classic appeal.
-              </p>
-              <p>
-                Order now and take the first step toward enhancing your
-                lifestyle with a product you'll love to use every day. Join
-                thousands of satisfied customers who have made this their go-to
-                choice.
-              </p>
               <p>
                 Discover the perfect blend of style and functionality with our
                 featured product. Crafted with premium materials, this item is

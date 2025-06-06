@@ -22,6 +22,7 @@ interface IVideoPlayerProps {
   index: number;
   currentVideoIndex: number;
   muted: boolean;
+  isOpenProductDetailModal: boolean;
   onUnmute: (muted: boolean) => void;
   handleOpenCartModal: () => void;
   handleOpenProductDetailModal: () => void;
@@ -36,6 +37,7 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
   currentVideoIndex,
   onUnmute,
   muted,
+  isOpenProductDetailModal,
   onRefReady,
   handleOpenCartModal,
   handleOpenProductDetailModal,
@@ -149,13 +151,13 @@ export const VideoPlayer: FC<IVideoPlayerProps> = ({
 
   useEffect(() => {
     if (videoRef.current && currentVideoIndex === index) {
-      if (isPlaying) {
+      if (isPlaying && !isOpenProductDetailModal) {
         videoRef.current.play().catch(console.error);
       } else {
         videoRef.current.pause();
       }
     }
-  }, [currentVideoIndex, index, isPlaying]);
+  }, [currentVideoIndex, index, isPlaying, isOpenProductDetailModal]);
 
   useEffect(() => {
     if (showPlayPauseIcon) {

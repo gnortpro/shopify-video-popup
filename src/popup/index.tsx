@@ -1,15 +1,17 @@
-import React, { useState, useRef, useCallback, type FC } from "react";
 import { X } from "lucide-react";
-import { VIDEO_URL } from "../data";
+import React, { useCallback, useRef, useState, type FC } from "react";
+import { type IVideo } from "../data";
 
 interface IVideoPopupPlayerProps {
-  onVideoClick: () => void;
+  video: IVideo;
+  onVideoClick: (id: number) => void;
   onClose?: () => void;
 }
 
 export const VideoPopup: FC<IVideoPopupPlayerProps> = ({
   onVideoClick,
   onClose,
+  video,
 }) => {
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -22,9 +24,9 @@ export const VideoPopup: FC<IVideoPopupPlayerProps> = ({
   const handleVideoClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      onVideoClick();
+      onVideoClick(video.id);
     },
-    [onVideoClick],
+    [onVideoClick, video.id],
   );
 
   if (!isVisible) return null;
@@ -42,7 +44,7 @@ export const VideoPopup: FC<IVideoPopupPlayerProps> = ({
         <div className="w-60 h-36 bg-black rounded-lg shadow-2xl overflow-hidden">
           <video
             ref={videoRef}
-            src={VIDEO_URL}
+            src={video.videoUrl}
             className="w-full h-full object-cover cursor-pointer"
             autoPlay
             muted
