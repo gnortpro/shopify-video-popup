@@ -61,7 +61,7 @@ export const CartItem: FC<ICartItemProps> = React.memo(
             <h4
               onClick={openProductDetailModal}
               className={cx(
-                "font-medium text-sm leading-tight md:text-base md:leading-normal text-gray-900 mb-3 md:mb-2 cursor-pointer",
+                "font-medium text-sm leading-tight md:text-base md:leading-normal text-gray-900 mb-3 md:mb-2",
               )}
             >
               <span className="line-clamp-2">{product.name}</span>

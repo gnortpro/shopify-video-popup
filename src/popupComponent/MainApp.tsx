@@ -137,7 +137,7 @@ export const MainApp: FC<IMainAppProps> = ({
           modules={[Mousewheel, Virtual]}
           grabCursor
           slidesPerView={1}
-          virtual
+          virtual={{ addSlidesAfter: 5 }}
           mousewheel={{ enabled: true, thresholdDelta: 5 }}
           onSwiper={handleSwiperInit}
           onSlideChange={handleSlideChange}
@@ -173,6 +173,7 @@ export const MainApp: FC<IMainAppProps> = ({
           isOpen={isOpenProductDetailModal}
           onClose={() => setOpenProductDetailModal(false)}
           product={videos[currentVideoIndex].products[0]}
+          handleOpenCartModal={() => setOpenCartModal(true)}
           width={videoWrapperWidth}
         />
 
@@ -187,7 +188,6 @@ export const MainApp: FC<IMainAppProps> = ({
           isOpen={isOpenCartModal}
           onClose={() => setOpenCartModal(false)}
           video={videos[currentVideoIndex]}
-          onOpenProductDetailModal={() => setOpenProductDetailModal(true)}
           width={videoWrapperWidth}
         />
 
