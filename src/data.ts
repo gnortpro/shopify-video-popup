@@ -1,3 +1,30 @@
+export interface ShopifyImage {
+  src: string;
+  height: number;
+  width: number;
+  media_type: string;
+}
+
+export interface ShopifyVariantInOption {
+  price: string | number;
+  image?: ShopifyImage;
+}
+
+export interface ShopifyOptionValue {
+  id: string;
+  name: string;
+  available: boolean;
+  image?: string; // lấy từ swatch.image qua filter | image_url
+  color?: string; // hex converted from swatch.color.rgb | color_to_hex
+  price: string; // lấy từ variant.price converted by | money
+}
+
+export interface ShopifyOptionWithValues {
+  name: string;
+  position: number;
+  values: ShopifyOptionValue[];
+}
+
 export type IMediaType = "image" | "video";
 
 export interface IStoriesCarouselProps {
@@ -13,11 +40,6 @@ export interface IStoryItemProps {
 export interface IProductMediaType {
   type: IMediaType;
   url: string;
-}
-
-export interface IProductOptionValue {
-  name: string;
-  variant: IProductVariant;
 }
 
 export interface IProductVariant {
@@ -36,7 +58,8 @@ export interface IProduct {
   originalPrice?: string;
   discount?: string;
   mediaFiles: IProductMediaType[];
-  optionValues?: IProductOptionValue[];
+  optionWithValues: ShopifyOptionWithValues[];
+  description?: string;
 }
 
 export interface IVideo {
@@ -70,6 +93,8 @@ export const VIDEOS: IVideo[] = [
         price: "28.990.000",
         originalPrice: "31.990.000",
         discount: "9%",
+        description:
+          "iPhone 15 Pro Max 256GB là siêu phẩm mới nhất từ Apple, sở hữu thiết kế sang trọng với khung viền titan bền bỉ và mặt kính cường lực. Máy trang bị màn hình Super Retina XDR sắc nét, hiệu năng vượt trội nhờ chip A17 Pro mạnh mẽ, đáp ứng mọi nhu cầu từ công việc đến giải trí. Cụm camera cải tiến cho phép chụp ảnh, quay video chuyên nghiệp với nhiều chế độ sáng tạo. Dung lượng pin lớn, hỗ trợ sạc nhanh và kết nối 5G giúp bạn luôn sẵn sàng mọi lúc mọi nơi. Sản phẩm phù hợp cho người yêu công nghệ và đam mê trải nghiệm mới.",
         mediaFiles: [
           {
             type: "video",
@@ -84,128 +109,77 @@ export const VIDEOS: IVideo[] = [
             url: "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=400&h=400&fit=crop",
           },
         ],
-        optionValues: [
+        optionWithValues: [
           {
             name: "Storage",
-            variant: {
-              id: "iphone-15-pro-max-256gb-black",
-              displayName: "256GB - Đen Titan",
-              image:
-                "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
-              price: "28.990.000",
-              compareAtPrice: "31.990.000",
-            },
-          },
-          {
-            name: "Storage",
-            variant: {
-              id: "iphone-15-pro-max-256gb-white",
-              displayName: "256GB - Trắng Titan",
-              image:
-                "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=120&h=120&fit=crop",
-              price: "28.990.000",
-              compareAtPrice: "31.990.000",
-            },
-          },
-          {
-            name: "Storage",
-            variant: {
-              id: "iphone-15-pro-max-512gb-black",
-              displayName: "512GB - Đen Titan",
-              image:
-                "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
-              price: "34.990.000",
-              compareAtPrice: "37.990.000",
-            },
-          },
-          {
-            name: "Storage",
-            variant: {
-              id: "iphone-15-pro-max-1tb-black",
-              displayName: "1TB - Đen Titan",
-              image:
-                "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
-              price: "40.990.000",
-              compareAtPrice: "43.990.000",
-            },
-          },
-        ],
-      },
-      {
-        id: 2,
-        name: "MacBook Air M3 13 inch",
-        price: "26.990.000",
-        originalPrice: "28.990.000",
-        discount: "7%",
-        mediaFiles: [
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&h=400&fit=crop",
-          },
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=400&fit=crop",
-          },
-        ],
-        optionValues: [
-          {
-            name: "Color",
-            variant: {
-              id: "macbook-air-m3-silver",
-              displayName: "8GB RAM + 256GB SSD - Bạc",
-              image:
-                "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=120&h=120&fit=crop",
-              price: "26.990.000",
-              compareAtPrice: "28.990.000",
-            },
+            position: 1,
+            values: [
+              {
+                id: "1",
+                name: "64gb",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "128gb",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
           {
             name: "Color",
-            variant: {
-              id: "macbook-air-m3-space-gray",
-              displayName: "8GB RAM + 256GB SSD - Xám",
-              image:
-                "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=120&h=120&fit=crop",
-              price: "26.990.000",
-              compareAtPrice: "28.990.000",
-            },
+            position: 2,
+            values: [
+              {
+                id: "1",
+                name: "Black",
+                available: true,
+                price: "28.990.000đ",
+                color: "#000000",
+              },
+              {
+                id: "2",
+                name: "Red",
+                available: true,
+                price: "28.990.000đ",
+                color: "#ff2d00",
+              },
+              {
+                id: "3",
+                name: "Green",
+                available: false,
+                price: "28.990.000đ",
+                color: "#00ff8f",
+              },
+            ],
           },
           {
-            name: "Storage",
-            variant: {
-              id: "macbook-air-m3-512gb-silver",
-              displayName: "8GB RAM + 512GB SSD - Bạc",
-              image:
-                "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=120&h=120&fit=crop",
-              price: "31.990.000",
-              compareAtPrice: "33.990.000",
-            },
-          },
-        ],
-      },
-      {
-        id: 3,
-        name: "AirPods Pro 2nd Generation",
-        price: "5.490.000",
-        originalPrice: "6.190.000",
-        discount: "11%",
-        mediaFiles: [
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=400&h=400&fit=crop",
-          },
-        ],
-        optionValues: [
-          {
-            name: "Model",
-            variant: {
-              id: "airpods-pro-2-usb-c",
-              displayName: "USB-C Charging Case",
-              image:
-                "https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=120&h=120&fit=crop",
-              price: "5.490.000",
-              compareAtPrice: "6.190.000",
-            },
+            name: "Material",
+            position: 3,
+            values: [
+              {
+                id: "1",
+                name: "Titan",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "Gold",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
         ],
       },
@@ -240,50 +214,77 @@ export const VIDEOS: IVideo[] = [
             url: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&h=400&fit=crop",
           },
         ],
-        optionValues: [
+        optionWithValues: [
           {
-            name: "Size",
-            variant: {
-              id: "nike-air-max-270-size-39",
-              displayName: "Size 39 - Trắng/Đen",
-              image:
-                "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=120&h=120&fit=crop",
-              price: "2.890.000",
-              compareAtPrice: "3.290.000",
-            },
-          },
-          {
-            name: "Size",
-            variant: {
-              id: "nike-air-max-270-size-40",
-              displayName: "Size 40 - Trắng/Đen",
-              image:
-                "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=120&h=120&fit=crop",
-              price: "2.890.000",
-              compareAtPrice: "3.290.000",
-            },
-          },
-          {
-            name: "Size",
-            variant: {
-              id: "nike-air-max-270-size-41",
-              displayName: "Size 41 - Trắng/Đen",
-              image:
-                "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=120&h=120&fit=crop",
-              price: "2.890.000",
-              compareAtPrice: "3.290.000",
-            },
+            name: "Storage",
+            position: 1,
+            values: [
+              {
+                id: "1",
+                name: "64gb",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "128gb",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
           {
             name: "Color",
-            variant: {
-              id: "nike-air-max-270-blue-size-40",
-              displayName: "Size 40 - Xanh/Trắng",
-              image:
-                "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=120&h=120&fit=crop",
-              price: "2.890.000",
-              compareAtPrice: "3.290.000",
-            },
+            position: 2,
+            values: [
+              {
+                id: "1",
+                name: "Black",
+                available: true,
+                price: "28.990.000đ",
+                color: "#000000",
+              },
+              {
+                id: "2",
+                name: "Red",
+                available: true,
+                price: "28.990.000đ",
+                color: "#ff2d00",
+              },
+              {
+                id: "3",
+                name: "Green",
+                available: false,
+                price: "28.990.000đ",
+                color: "#00ff8f",
+              },
+            ],
+          },
+          {
+            name: "Material",
+            position: 3,
+            values: [
+              {
+                id: "1",
+                name: "Titan",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "Gold",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
         ],
       },
@@ -299,39 +300,77 @@ export const VIDEOS: IVideo[] = [
             url: "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&h=400&fit=crop",
           },
         ],
-        optionValues: [
+        optionWithValues: [
           {
-            name: "Flavor",
-            variant: {
-              id: "whey-protein-vanilla",
-              displayName: "2.27kg - Vanilla",
-              image:
-                "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=120&h=120&fit=crop",
-              price: "1.590.000",
-              compareAtPrice: "1.790.000",
-            },
+            name: "Storage",
+            position: 1,
+            values: [
+              {
+                id: "1",
+                name: "64gb",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "128gb",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
           {
-            name: "Flavor",
-            variant: {
-              id: "whey-protein-chocolate",
-              displayName: "2.27kg - Chocolate",
-              image:
-                "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=120&h=120&fit=crop",
-              price: "1.590.000",
-              compareAtPrice: "1.790.000",
-            },
+            name: "Color",
+            position: 2,
+            values: [
+              {
+                id: "1",
+                name: "Black",
+                available: true,
+                price: "28.990.000đ",
+                color: "#000000",
+              },
+              {
+                id: "2",
+                name: "Red",
+                available: true,
+                price: "28.990.000đ",
+                color: "#ff2d00",
+              },
+              {
+                id: "3",
+                name: "Green",
+                available: false,
+                price: "28.990.000đ",
+                color: "#00ff8f",
+              },
+            ],
           },
           {
-            name: "Flavor",
-            variant: {
-              id: "whey-protein-strawberry",
-              displayName: "2.27kg - Strawberry",
-              image:
-                "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=120&h=120&fit=crop",
-              price: "1.590.000",
-              compareAtPrice: "1.790.000",
-            },
+            name: "Material",
+            position: 3,
+            values: [
+              {
+                id: "1",
+                name: "Titan",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "Gold",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
         ],
       },
@@ -347,39 +386,77 @@ export const VIDEOS: IVideo[] = [
             url: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop",
           },
         ],
-        optionValues: [
+        optionWithValues: [
           {
-            name: "Color",
-            variant: {
-              id: "yoga-mat-purple",
-              displayName: "6mm - Tím",
-              image:
-                "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=120&h=120&fit=crop",
-              price: "890.000",
-              compareAtPrice: "1.190.000",
-            },
+            name: "Storage",
+            position: 1,
+            values: [
+              {
+                id: "1",
+                name: "64gb",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "128gb",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
           {
             name: "Color",
-            variant: {
-              id: "yoga-mat-blue",
-              displayName: "6mm - Xanh Dương",
-              image:
-                "https://images.unsplash.com/photo-1506629905607-8fc8bfaf567e?w=120&h=120&fit=crop",
-              price: "890.000",
-              compareAtPrice: "1.190.000",
-            },
+            position: 2,
+            values: [
+              {
+                id: "1",
+                name: "Black",
+                available: true,
+                price: "28.990.000đ",
+                color: "#000000",
+              },
+              {
+                id: "2",
+                name: "Red",
+                available: true,
+                price: "28.990.000đ",
+                color: "#ff2d00",
+              },
+              {
+                id: "3",
+                name: "Green",
+                available: false,
+                price: "28.990.000đ",
+                color: "#00ff8f",
+              },
+            ],
           },
           {
-            name: "Color",
-            variant: {
-              id: "yoga-mat-pink",
-              displayName: "6mm - Hồng",
-              image:
-                "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=120&h=120&fit=crop",
-              price: "890.000",
-              compareAtPrice: "1.190.000",
-            },
+            name: "Material",
+            position: 3,
+            values: [
+              {
+                id: "1",
+                name: "Titan",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "Gold",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
         ],
       },
@@ -413,39 +490,77 @@ export const VIDEOS: IVideo[] = [
             url: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=400&fit=crop",
           },
         ],
-        optionValues: [
+        optionWithValues: [
           {
-            name: "Size",
-            variant: {
-              id: "shirt-white-size-m",
-              displayName: "Size M - Trắng",
-              image:
-                "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=120&h=120&fit=crop",
-              price: "650.000",
-              compareAtPrice: "850.000",
-            },
-          },
-          {
-            name: "Size",
-            variant: {
-              id: "shirt-white-size-l",
-              displayName: "Size L - Trắng",
-              image:
-                "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=120&h=120&fit=crop",
-              price: "650.000",
-              compareAtPrice: "850.000",
-            },
+            name: "Storage",
+            position: 1,
+            values: [
+              {
+                id: "1",
+                name: "64gb",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "128gb",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
           {
             name: "Color",
-            variant: {
-              id: "shirt-blue-size-m",
-              displayName: "Size M - Xanh Navy",
-              image:
-                "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=120&h=120&fit=crop",
-              price: "650.000",
-              compareAtPrice: "850.000",
-            },
+            position: 2,
+            values: [
+              {
+                id: "1",
+                name: "Black",
+                available: true,
+                price: "28.990.000đ",
+                color: "#000000",
+              },
+              {
+                id: "2",
+                name: "Red",
+                available: true,
+                price: "28.990.000đ",
+                color: "#ff2d00",
+              },
+              {
+                id: "3",
+                name: "Green",
+                available: false,
+                price: "28.990.000đ",
+                color: "#00ff8f",
+              },
+            ],
+          },
+          {
+            name: "Material",
+            position: 3,
+            values: [
+              {
+                id: "1",
+                name: "Titan",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "Gold",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
         ],
       },
@@ -461,28 +576,77 @@ export const VIDEOS: IVideo[] = [
             url: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop",
           },
         ],
-        optionValues: [
+        optionWithValues: [
           {
-            name: "Color",
-            variant: {
-              id: "handbag-brown",
-              displayName: "Da Nâu",
-              image:
-                "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=120&h=120&fit=crop",
-              price: "1.290.000",
-              compareAtPrice: "1.690.000",
-            },
+            name: "Storage",
+            position: 1,
+            values: [
+              {
+                id: "1",
+                name: "64gb",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "128gb",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
           {
             name: "Color",
-            variant: {
-              id: "handbag-black",
-              displayName: "Da Đen",
-              image:
-                "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=120&h=120&fit=crop",
-              price: "1.290.000",
-              compareAtPrice: "1.690.000",
-            },
+            position: 2,
+            values: [
+              {
+                id: "1",
+                name: "Black",
+                available: true,
+                price: "28.990.000đ",
+                color: "#000000",
+              },
+              {
+                id: "2",
+                name: "Red",
+                available: true,
+                price: "28.990.000đ",
+                color: "#ff2d00",
+              },
+              {
+                id: "3",
+                name: "Green",
+                available: false,
+                price: "28.990.000đ",
+                color: "#00ff8f",
+              },
+            ],
+          },
+          {
+            name: "Material",
+            position: 3,
+            values: [
+              {
+                id: "1",
+                name: "Titan",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "Gold",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
         ],
       },
@@ -510,28 +674,77 @@ export const VIDEOS: IVideo[] = [
             url: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=400&fit=crop",
           },
         ],
-        optionValues: [
+        optionWithValues: [
           {
-            name: "Type",
-            variant: {
-              id: "philips-hue-white-ambiance",
-              displayName: "White Ambiance Starter Kit",
-              image:
-                "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=120&h=120&fit=crop",
-              price: "2.390.000",
-              compareAtPrice: "2.690.000",
-            },
+            name: "Storage",
+            position: 1,
+            values: [
+              {
+                id: "1",
+                name: "64gb",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "128gb",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
           {
-            name: "Type",
-            variant: {
-              id: "philips-hue-color",
-              displayName: "Color Starter Kit",
-              image:
-                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop",
-              price: "3.590.000",
-              compareAtPrice: "3.990.000",
-            },
+            name: "Color",
+            position: 2,
+            values: [
+              {
+                id: "1",
+                name: "Black",
+                available: true,
+                price: "28.990.000đ",
+                color: "#000000",
+              },
+              {
+                id: "2",
+                name: "Red",
+                available: true,
+                price: "28.990.000đ",
+                color: "#ff2d00",
+              },
+              {
+                id: "3",
+                name: "Green",
+                available: false,
+                price: "28.990.000đ",
+                color: "#00ff8f",
+              },
+            ],
+          },
+          {
+            name: "Material",
+            position: 3,
+            values: [
+              {
+                id: "1",
+                name: "Titan",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "Gold",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
         ],
       },
@@ -547,17 +760,77 @@ export const VIDEOS: IVideo[] = [
             url: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=400&fit=crop",
           },
         ],
-        optionValues: [
+        optionWithValues: [
           {
-            name: "Model",
-            variant: {
-              id: "xiaomi-vacuum-s10",
-              displayName: "Xiaomi Robot Vacuum S10",
-              image:
-                "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=120&h=120&fit=crop",
-              price: "4.990.000",
-              compareAtPrice: "5.990.000",
-            },
+            name: "Storage",
+            position: 1,
+            values: [
+              {
+                id: "1",
+                name: "64gb",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "128gb",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
+          },
+          {
+            name: "Color",
+            position: 2,
+            values: [
+              {
+                id: "1",
+                name: "Black",
+                available: true,
+                price: "28.990.000đ",
+                color: "#000000",
+              },
+              {
+                id: "2",
+                name: "Red",
+                available: true,
+                price: "28.990.000đ",
+                color: "#ff2d00",
+              },
+              {
+                id: "3",
+                name: "Green",
+                available: false,
+                price: "28.990.000đ",
+                color: "#00ff8f",
+              },
+            ],
+          },
+          {
+            name: "Material",
+            position: 3,
+            values: [
+              {
+                id: "1",
+                name: "Titan",
+                available: true,
+                price: "28.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+              {
+                id: "2",
+                name: "Gold",
+                available: false,
+                price: "34.990.000đ",
+                image:
+                  "https://images.unsplash.com/photo-1603921326210-6edd2d60ca68?w=120&h=120&fit=crop",
+              },
+            ],
           },
         ],
       },

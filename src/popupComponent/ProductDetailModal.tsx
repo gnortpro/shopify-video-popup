@@ -7,6 +7,8 @@ import {
   X,
   Minus,
   Plus,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import React, {
   useCallback,
@@ -15,9 +17,10 @@ import React, {
   useState,
   type FC,
   type ChangeEvent,
+  useMemo,
 } from "react";
 import cx from "classnames";
-import type { IProduct, IProductMediaType, IProductVariant } from "../data";
+import type { IProduct, IProductMediaType, ShopifyOptionValue } from "../data";
 import { Mousewheel, Pagination, Navigation, Virtual } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -57,10 +60,11 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
   const [mediaModalFiles, setMediaModalFiles] = useState<IProductMediaType[]>(
     [],
   );
+  const [showErrorBanner, setShowErrorBanner] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("This process has error");
 
-  // State cho variant selection và quantity
   const [selectedVariants, setSelectedVariants] = useState<
-    Record<string, IProductVariant>
+    Record<string, ShopifyOptionValue>
   >({});
   const [quantity, setQuantity] = useState(1);
   const [isVariantDropdownOpen, setIsVariantDropdownOpen] = useState<
@@ -72,6 +76,7 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
   const [variantErrors, setVariantErrors] = useState<Record<string, boolean>>(
     {},
   );
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const handlePlayPauseClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>): void => {
@@ -107,25 +112,16 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
   );
 
   const onAddToCart = useCallback((): void => {
-    // Validate variants - check if product has variants and user has selected all required ones
-    if (product.optionValues && product.optionValues.length > 0) {
-      const variantGroups = product.optionValues.reduce(
-        (groups, option) => {
-          if (!groups[option.name]) {
-            groups[option.name] = [];
-          }
-          groups[option.name].push(option);
-          return groups;
-        },
-        {} as Record<string, typeof product.optionValues>,
-      );
+    if (isAddingToCart) return; // Prevent multiple clicks
 
+    // Validate variants - check if product has variants and user has selected all required ones
+    if (product.optionWithValues && product.optionWithValues.length > 0) {
       const missingVariants: Record<string, boolean> = {};
       let hasErrors = false;
 
-      Object.keys(variantGroups).forEach((optionName) => {
-        if (!selectedVariants[optionName]) {
-          missingVariants[optionName] = true;
+      product.optionWithValues.forEach((option) => {
+        if (!selectedVariants[option.name]) {
+          missingVariants[option.name] = true;
           hasErrors = true;
         }
       });
@@ -149,6 +145,9 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
       quantity,
     });
 
+    // Set loading state
+    setIsAddingToCart(true);
+
     // Trigger animation
     setIsAnimating(true);
 
@@ -157,13 +156,14 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
       setCartItemsCount((prev) => prev + quantity);
       setCartIconAnimation("animate-cart-pulse");
       setIsAnimating(false);
+      setIsAddingToCart(false);
     }, 800);
 
     // Remove cart icon animation
     setTimeout(() => {
       setCartIconAnimation("");
     }, 1400);
-  }, [product, selectedVariants, quantity]);
+  }, [product, selectedVariants, quantity, isAddingToCart]);
 
   const handleCloseClick = useCallback((): void => {
     onClose();
@@ -214,7 +214,6 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
     [product.mediaFiles],
   );
 
-  // Handlers cho quantity
   const decreaseQuantity = useCallback((): void => {
     setQuantity((current) => Math.max(1, current - 1));
   }, []);
@@ -233,35 +232,44 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
     [],
   );
 
-  // Handler cho variant selection
   const handleVariantSelect = useCallback(
-    (optionName: string, variantId: string): void => {
-      const selectedOption = product.optionValues?.find(
-        (option) => option.variant.id === variantId,
-      );
-      if (selectedOption) {
-        setSelectedVariants((prev) => ({
-          ...prev,
-          [optionName]: selectedOption.variant,
-        }));
-        setIsVariantDropdownOpen((prev) => ({ ...prev, [optionName]: false }));
+    (optionName: string, optionValue: ShopifyOptionValue): void => {
+      setSelectedVariants((prev) => ({
+        ...prev,
+        [optionName]: optionValue,
+      }));
+      setIsVariantDropdownOpen((prev) => ({ ...prev, [optionName]: false }));
 
-        // Clear error for this option when user selects a variant
-        setVariantErrors((prev) => ({
-          ...prev,
-          [optionName]: false,
-        }));
-      }
+      setVariantErrors((prev) => ({
+        ...prev,
+        [optionName]: false,
+      }));
     },
-    [product.optionValues],
+    [],
   );
 
   const toggleVariantDropdown = useCallback((optionName: string) => {
-    setIsVariantDropdownOpen((prev) => ({
-      ...prev,
-      [optionName]: !prev[optionName],
-    }));
+    setIsVariantDropdownOpen((prev) => {
+      const newState = Object.keys(prev).reduce(
+        (acc, key) => {
+          acc[key] = false;
+          return acc;
+        },
+        {} as Record<string, boolean>,
+      );
+
+      newState[optionName] = !prev[optionName];
+      return newState;
+    });
   }, []);
+
+  const getCurrentPrice = useCallback((): string => {
+    const selectedVariantValues = Object.values(selectedVariants);
+    if (selectedVariantValues.length > 0) {
+      return selectedVariantValues[0].price.replace("đ", "");
+    }
+    return product.price;
+  }, [selectedVariants, product.price]);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -276,16 +284,13 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setIsFullScreen(false);
-      // Reset selections khi mở modal
       setSelectedVariants({});
       setQuantity(1);
       setIsVariantDropdownOpen({});
       setVariantErrors({});
-      // Không reset cart count khi mở modal
     }
-  }, [isOpen, product.optionValues]);
+  }, [isOpen, product.optionWithValues]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -302,6 +307,20 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isVariantDropdownOpen]);
+
+  const isAddToCartDisabled = useMemo(() => {
+    // Disabled if loading
+    if (isAddingToCart) return true;
+
+    // Disabled if has required variants but not all selected
+    // if (product.optionWithValues && product.optionWithValues.length > 0) {
+    //   return product.optionWithValues.some(
+    //     (option) => !selectedVariants[option.name],
+    //   );
+    // }
+
+    return false;
+  }, [isAddingToCart]);
 
   if (!isOpen || !product) return null;
 
@@ -410,16 +429,14 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
               "bg-white px-4 py-4 pb-24 max-h-[calc(100%-270px)] overflow-y-auto",
             )}
           >
-            {/* 1. Title */}
             <h1 className="text-lg font-medium text-gray-800 mb-3 leading-tight">
               {product.name}
             </h1>
 
-            {/* 2. Price */}
             <div className="mb-6">
               <div className="flex items-center space-x-2 mb-1">
                 <span className="text-2xl font-bold text-orange-500">
-                  ₫{Object.values(selectedVariants)[0]?.price || product.price}
+                  ₫{getCurrentPrice()}
                 </span>
                 {product.originalPrice && (
                   <span className="text-sm text-gray-400 line-through">
@@ -434,208 +451,222 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
               </div>
             </div>
 
-            {/* 3. Variants Picker */}
-            {product.optionValues && product.optionValues.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">
-                  Tùy chọn sản phẩm
-                </h3>
+            {product.optionWithValues &&
+              product.optionWithValues.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">
+                    Tùy chọn sản phẩm
+                  </h3>
 
-                {/* Group variants by name */}
-                {Object.entries(
-                  product.optionValues.reduce(
-                    (groups, option) => {
-                      if (!groups[option.name]) {
-                        groups[option.name] = [];
-                      }
-                      groups[option.name].push(option);
-                      return groups;
-                    },
-                    {} as Record<string, typeof product.optionValues>,
-                  ),
-                ).map(([optionName, options]) => {
-                  // Find current selected variant for this option group
-                  const currentVariantForGroup = selectedVariants[optionName];
+                  {product.optionWithValues.map((option) => {
+                    const currentVariantForOption =
+                      selectedVariants[option.name];
 
-                  return (
-                    <div key={optionName} className="mb-4 last:mb-0">
-                      <label className="block text-sm font-medium text-gray-600 mb-2">
-                        {optionName === "Storage"
-                          ? "Dung lượng"
-                          : optionName === "Color"
-                            ? "Màu sắc"
-                            : optionName === "Size"
-                              ? "Kích thước"
-                              : optionName === "Flavor"
-                                ? "Hương vị"
-                                : optionName === "Model"
-                                  ? "Phiên bản"
-                                  : optionName === "Type"
-                                    ? "Loại"
-                                    : optionName}
-                      </label>
+                    return (
+                      <div key={option.name} className="mb-4 last:mb-0">
+                        <label className="block text-sm font-medium text-gray-600 mb-2">
+                          {option.name}
+                        </label>
 
-                      <div className="relative variant-dropdown">
-                        {/* Custom Select Button */}
-                        <button
-                          type="button"
-                          onClick={() => toggleVariantDropdown(optionName)}
-                          className={cx(
-                            "w-full p-3 border rounded-lg bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all duration-200 text-left flex items-center justify-between",
-                            {
-                              "border-red-500 ring-2 ring-red-200":
-                                variantErrors[optionName],
-                              "border-gray-300": !variantErrors[optionName],
-                            },
-                          )}
-                        >
-                          <div className="flex items-center flex-1">
-                            {currentVariantForGroup ? (
-                              <>
-                                <div className="w-8 h-8 mr-3 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                                  <img
-                                    src={currentVariantForGroup.image}
-                                    alt={currentVariantForGroup.displayName}
-                                    className="w-full h-full object-cover"
-                                    loading="lazy"
-                                  />
-                                </div>
-                                <div className="flex-1">
-                                  <span className="text-gray-900 font-medium text-sm">
-                                    {currentVariantForGroup.displayName}
-                                  </span>
-                                  <span className="text-orange-600 font-semibold text-sm ml-2">
-                                    ₫{currentVariantForGroup.price}
-                                  </span>
-                                </div>
-                              </>
-                            ) : (
-                              <span
-                                className={cx("text-gray-500", {
-                                  "text-red-500": variantErrors[optionName],
-                                })}
-                              >
-                                Chọn {optionName}
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Dropdown Arrow */}
-                          <svg
+                        <div className="relative variant-dropdown">
+                          <button
+                            type="button"
+                            onClick={() => toggleVariantDropdown(option.name)}
                             className={cx(
-                              "w-5 h-5 transition-transform duration-200",
+                              "w-full p-3 border rounded-lg bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all duration-200 text-left flex items-center justify-between",
                               {
-                                "rotate-180": isVariantDropdownOpen[optionName],
-                                "text-red-400": variantErrors[optionName],
-                                "text-gray-400": !variantErrors[optionName],
+                                "border-red-500 ring-2 ring-red-200":
+                                  variantErrors[option.name],
+                                "border-gray-300": !variantErrors[option.name],
                               },
                             )}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </button>
-
-                        {/* Error Message */}
-                        {variantErrors[optionName] && (
-                          <div className="mt-1 text-red-500 text-xs flex items-center gap-1">
-                            <svg
-                              className="w-4 h-4"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            Vui lòng chọn {optionName}
-                          </div>
-                        )}
-
-                        {/* Dropdown Options */}
-                        {isVariantDropdownOpen[optionName] && (
-                          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-                            {options.map((option) => (
-                              <button
-                                key={option.variant.id}
-                                type="button"
-                                onClick={() =>
-                                  handleVariantSelect(
-                                    optionName,
-                                    option.variant.id,
-                                  )
-                                }
-                                className={cx(
-                                  "w-full p-3 text-left hover:bg-gray-50 transition-colors duration-150 flex items-center border-b border-gray-100 last:border-b-0",
-                                  {
-                                    "bg-orange-50 text-orange-700":
-                                      selectedVariants[optionName]?.id ===
-                                      option.variant.id,
-                                  },
-                                )}
-                              >
-                                <div className="w-10 h-10 mr-3 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                                  <img
-                                    src={option.variant.image}
-                                    alt={option.variant.displayName}
-                                    className="w-full h-full object-cover"
-                                    loading="lazy"
-                                  />
-                                </div>
-                                <div className="flex-1">
-                                  <div className="font-medium text-gray-900 text-sm">
-                                    {option.variant.displayName}
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-orange-600 font-semibold text-sm">
-                                      ₫{option.variant.price}
-                                    </span>
-                                    {option.variant.compareAtPrice && (
-                                      <span className="text-gray-400 line-through text-xs">
-                                        ₫{option.variant.compareAtPrice}
-                                      </span>
+                            <div className="flex items-center flex-1">
+                              {currentVariantForOption ? (
+                                <>
+                                  <div className="w-8 h-8 mr-3 bg-gray-100 rounded overflow-hidden flex-shrink-0 relative">
+                                    {currentVariantForOption.image && (
+                                      <img
+                                        src={currentVariantForOption.image}
+                                        alt={currentVariantForOption.name}
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                      />
+                                    )}
+                                    {currentVariantForOption.color && (
+                                      <div
+                                        className="absolute bottom-0 right-0 w-4 h-4 border-2 border-white rounded-full"
+                                        style={{
+                                          backgroundColor:
+                                            currentVariantForOption.color,
+                                        }}
+                                      />
                                     )}
                                   </div>
-                                </div>
-
-                                {/* Selected indicator */}
-                                {selectedVariants[optionName]?.id ===
-                                  option.variant.id && (
-                                  <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center ml-2">
-                                    <svg
-                                      className="w-3 h-3 text-white"
-                                      fill="currentColor"
-                                      viewBox="0 0 20 20"
-                                    >
-                                      <path
-                                        fillRule="evenodd"
-                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                        clipRule="evenodd"
-                                      />
-                                    </svg>
+                                  <div className="flex-1">
+                                    <span className="text-gray-900 font-medium text-sm">
+                                      {currentVariantForOption.name}
+                                    </span>
+                                    <span className="text-orange-600 font-semibold text-sm ml-2">
+                                      {currentVariantForOption.price}
+                                    </span>
                                   </div>
-                                )}
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                                </>
+                              ) : (
+                                <span
+                                  className={cx("text-gray-500", {
+                                    "text-red-500": variantErrors[option.name],
+                                  })}
+                                >
+                                  Chọn {option.name}
+                                </span>
+                              )}
+                            </div>
+
+                            <svg
+                              className={cx(
+                                "w-5 h-5 transition-transform duration-200",
+                                {
+                                  "rotate-180":
+                                    isVariantDropdownOpen[option.name],
+                                  "text-red-400": variantErrors[option.name],
+                                  "text-gray-400": !variantErrors[option.name],
+                                },
+                              )}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 9l-7 7-7-7"
+                              />
+                            </svg>
+                          </button>
+
+                          {variantErrors[option.name] && (
+                            <div className="mt-1 text-red-500 text-xs flex items-center gap-1">
+                              <svg
+                                className="w-4 h-4"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              Vui lòng chọn {option.name}
+                            </div>
+                          )}
+
+                          {isVariantDropdownOpen[option.name] && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                              {option.values.map((value) => (
+                                <button
+                                  key={value.id}
+                                  type="button"
+                                  onClick={() =>
+                                    handleVariantSelect(option.name, value)
+                                  }
+                                  disabled={!value.available}
+                                  className={cx(
+                                    "w-full p-3 text-left hover:bg-gray-50 transition-colors duration-150 flex items-center border-b border-gray-100 last:border-b-0",
+                                    {
+                                      "bg-orange-50 text-orange-700":
+                                        selectedVariants[option.name]?.id ===
+                                        value.id,
+                                      "opacity-50 cursor-not-allowed":
+                                        !value.available,
+                                    },
+                                  )}
+                                >
+                                  <div className="w-10 h-10 mr-3 bg-gray-100 rounded overflow-hidden flex-shrink-0 relative">
+                                    {value.image && (
+                                      <img
+                                        src={value.image}
+                                        alt={value.name}
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                      />
+                                    )}
+                                    {value.color && (
+                                      <div
+                                        className="w-full h-full"
+                                        style={{
+                                          backgroundColor: value.color,
+                                        }}
+                                      />
+                                    )}
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="font-medium text-gray-900 text-sm flex items-center gap-2">
+                                      {value.name}
+                                      {!value.available && (
+                                        <span className="text-xs text-red-500 bg-red-50 px-2 py-1 rounded">
+                                          Hết hàng
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-orange-600 font-semibold text-sm">
+                                        {value.price}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {selectedVariants[option.name]?.id ===
+                                    value.id && (
+                                    <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center ml-2">
+                                      <svg
+                                        className="w-3 h-3 text-white"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                    </div>
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+              )}
+
+            {showErrorBanner && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-red-700 text-sm font-medium">
+                      {errorMessage}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowErrorBanner(false);
+                      setErrorMessage("");
+                    }}
+                    className="text-red-400 hover:text-red-600 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* 4. Quantity */}
             <div className="mb-6" id="quantity-section">
               <h3 className="text-sm font-medium text-gray-700 mb-3">
                 Số lượng
@@ -681,7 +712,6 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
                   <Plus className="w-4 h-4" />
                 </button>
 
-                {/* Animation Number - starts from quantity input */}
                 {isAnimating && (
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-50">
                     <div className="animate-bounce-to-cart bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
@@ -692,52 +722,16 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
               </div>
             </div>
 
-            {/* 5. Description */}
-            <div className="space-y-4 text-gray-600">
-              <p>
-                Discover the perfect blend of style and functionality with our
-                featured product. Crafted with premium materials, this item is
-                designed to elevate your everyday experience. Whether you're
-                looking for durability, comfort, or a touch of elegance, this
-                product delivers on all fronts.
-              </p>
-              <p>
-                Its sleek design seamlessly fits into any setting, making it a
-                versatile addition to your collection. Enjoy the benefits of
-                advanced technology and thoughtful engineering, ensuring
-                long-lasting performance and reliability.
-              </p>
-              <p>
-                The product's intuitive features make it easy to use, while its
-                robust construction guarantees it will stand the test of time.
-                Ideal for both personal use and gifting, it's a choice that
-                brings satisfaction to every customer.
-              </p>
-              <p>
-                Our commitment to quality means you can shop with confidence,
-                knowing that each detail has been carefully considered. From the
-                smooth finish to the ergonomic design, every aspect is tailored
-                to meet your needs.
-              </p>
-              <p>
-                Experience the difference that superior craftsmanship makes, and
-                see why this product is a favorite among our customers. Don't
-                miss out on this opportunity to own a product that combines
-                innovation with classic appeal.
-              </p>
-              <p>
-                Order now and take the first step toward enhancing your
-                lifestyle with a product you'll love to use every day. Join
-                thousands of satisfied customers who have made this their go-to
-                choice.
-              </p>
-            </div>
+            {product.description && (
+              <div className="space-y-4 text-gray-600">
+                {product.description}
+              </div>
+            )}
           </div>
 
           <div className="fixed bottom-4 left-4 right-4 mx-auto max-w-sm">
-            <div className="bg-orange-500 rounded-lg p-3 shadow-lg relative">
+            <div className="rounded-lg bg-white p-3 shadow-lg relative">
               <div className="flex items-center justify-between gap-3">
-                {/* Cart Icon Button */}
                 <button
                   onClick={handleOpenCartModal}
                   className={cx(
@@ -757,13 +751,22 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
                   )}
                 </button>
 
-                {/* Add to Cart Button */}
                 <button
-                  className="flex-1 flex items-center justify-center gap-2 text-white cursor-pointer relative py-2"
+                  className={cx(
+                    "flex-1 h-12 rounded-lg flex items-center justify-center gap-2 text-white cursor-pointer relative py-2 transition-all duration-200 hover:bg-orange-700",
+                    {
+                      "opacity-50 cursor-not-allowed": isAddToCartDisabled,
+                      "bg-orange-500": !isAddToCartDisabled,
+                      "bg-gray-400": isAddToCartDisabled,
+                    },
+                  )}
                   onClick={onAddToCart}
+                  disabled={isAddToCartDisabled}
                   id="add-to-cart-btn"
                 >
-                  <ShoppingCart className="w-5 h-5" />
+                  {isAddingToCart && (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  )}
                   <span className="text-md font-medium">Thêm vào Giỏ hàng</span>
                 </button>
               </div>
