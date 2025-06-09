@@ -124,7 +124,7 @@ export const MainApp: FC<IMainAppProps> = ({
       initCurrentVideoIndex >= 0 &&
       !!swiperRef.current
     ) {
-      swiperRef.current.slideTo(initCurrentVideoIndex);
+      swiperRef.current.slideTo(initCurrentVideoIndex, 0);
     }
   }, [initCurrentVideoIndex]);
 

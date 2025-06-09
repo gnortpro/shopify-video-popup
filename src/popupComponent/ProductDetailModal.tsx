@@ -77,6 +77,7 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
     {},
   );
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
 
   const handlePlayPauseClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>): void => {
@@ -112,9 +113,8 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
   );
 
   const onAddToCart = useCallback((): void => {
-    if (isAddingToCart) return; // Prevent multiple clicks
+    if (isAddingToCart) return;
 
-    // Validate variants - check if product has variants and user has selected all required ones
     if (product.optionWithValues && product.optionWithValues.length > 0) {
       const missingVariants: Record<string, boolean> = {};
       let hasErrors = false;
@@ -128,7 +128,6 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
 
       if (hasErrors) {
         setVariantErrors(missingVariants);
-        // Auto-clear errors after 3 seconds
         setTimeout(() => {
           setVariantErrors({});
         }, 3000);
@@ -136,7 +135,6 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
       }
     }
 
-    // Clear any existing errors
     setVariantErrors({});
 
     console.log("Add to cart:", {
@@ -145,13 +143,10 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
       quantity,
     });
 
-    // Set loading state
     setIsAddingToCart(true);
 
-    // Trigger animation
     setIsAnimating(true);
 
-    // Update cart count and trigger cart icon animation
     setTimeout(() => {
       setCartItemsCount((prev) => prev + quantity);
       setCartIconAnimation("animate-cart-pulse");
@@ -159,7 +154,6 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
       setIsAddingToCart(false);
     }, 800);
 
-    // Remove cart icon animation
     setTimeout(() => {
       setCartIconAnimation("");
     }, 1400);
@@ -175,13 +169,35 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
       const target = e.currentTarget;
       const scrollTop = target.scrollTop;
 
-      if (scrollTop > 50 && !isFullScreen) {
-        setIsFullScreen(true);
-      } else if (scrollTop <= 20 && isFullScreen) {
-        setIsFullScreen(false);
+      if (window.innerWidth >= 768) {
+        if (scrollTop > 50 && !isFullScreen) {
+          setIsFullScreen(true);
+        } else if (scrollTop <= 20 && isFullScreen) {
+          setIsFullScreen(false);
+        }
+      } else {
+        if (scrollTop > 100 && !isMobileExpanded) {
+          setIsMobileExpanded(true);
+        }
       }
     },
-    [isFullScreen],
+    [isFullScreen, isMobileExpanded],
+  );
+
+  const handleContentScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>): void => {
+      if (window.innerWidth < 768) {
+        const target = e.currentTarget;
+        const scrollTop = target.scrollTop;
+
+        if (scrollTop > 50 && !isMobileExpanded) {
+          setIsMobileExpanded(true);
+        } else if (scrollTop <= 20 && isMobileExpanded) {
+          setIsMobileExpanded(false);
+        }
+      }
+    },
+    [isMobileExpanded],
   );
 
   const handleSwiperInit = useCallback((swiper: SwiperType): void => {
@@ -309,18 +325,31 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
   }, [isVariantDropdownOpen]);
 
   const isAddToCartDisabled = useMemo(() => {
-    // Disabled if loading
     if (isAddingToCart) return true;
-
-    // Disabled if has required variants but not all selected
-    // if (product.optionWithValues && product.optionWithValues.length > 0) {
-    //   return product.optionWithValues.some(
-    //     (option) => !selectedVariants[option.name],
-    //   );
-    // }
-
     return false;
   }, [isAddingToCart]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMobileExpanded(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsFullScreen(false);
+      setIsMobileExpanded(false);
+      setSelectedVariants({});
+      setQuantity(1);
+      setIsVariantDropdownOpen({});
+      setVariantErrors({});
+    }
+  }, [isOpen, product.id]);
 
   if (!isOpen || !product) return null;
 
@@ -328,7 +357,15 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
     <>
       <div
         className={cx(
-          "fixed h-full m-auto top-0 z-100 animate-slideInUp left-0 w-full flex items-end justify-center transition-all",
+          "fixed inset-0 bg-[#000000c2] transition-all duration-500 z-[99]",
+          isMobileExpanded ? "bg-opacity-80" : "bg-opacity-40 md:bg-opacity-80",
+        )}
+        onClick={handleOverlayClick}
+      />
+      <div
+        className={cx(
+          "fixed md:h-full m-auto bottom-0 md:top-0 z-100 animate-slideInUp left-0 w-full flex items-end justify-center transition-all",
+          isMobileExpanded ? "h-full" : "h-[80vh]",
         )}
         onClick={handleOverlayClick}
       >
@@ -417,7 +454,7 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
               <X className="text-gray-400 w-5 h-5" />
             </button>
 
-            {!isFullScreen && (
+            {!isFullScreen && !isMobileExpanded && (
               <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
                 <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
               </div>
@@ -426,8 +463,14 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
 
           <div
             className={cx(
-              "bg-white px-4 py-4 pb-24 max-h-[calc(100%-270px)] overflow-y-auto",
+              "bg-white px-4 py-4 overflow-y-auto",
+              isMobileExpanded ? "pb-24" : "pb-32",
+              "md:max-h-[calc(100%-270px)] md:pb-24",
+              isMobileExpanded
+                ? "max-h-[calc(100%-300px)]"
+                : "max-h-[calc(80vh-200px)]",
             )}
+            onScroll={handleContentScroll}
           >
             <h1 className="text-lg font-medium text-gray-800 mb-3 leading-tight">
               {product.name}
@@ -484,7 +527,7 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
                             <div className="flex items-center flex-1">
                               {currentVariantForOption ? (
                                 <>
-                                  <div className="w-8 h-8 mr-3 bg-gray-100 rounded overflow-hidden flex-shrink-0 relative">
+                                  <div className="w-8 h-8 mr-3 rounded overflow-hidden flex-shrink-0 relative">
                                     {currentVariantForOption.image && (
                                       <img
                                         src={currentVariantForOption.image}
@@ -495,7 +538,7 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
                                     )}
                                     {currentVariantForOption.color && (
                                       <div
-                                        className="absolute bottom-0 right-0 w-4 h-4 border-2 border-white rounded-full"
+                                        className="absolute bottom-0 right-0 w-full h-full border-2 border-white rounded"
                                         style={{
                                           backgroundColor:
                                             currentVariantForOption.color,
@@ -729,7 +772,12 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
             )}
           </div>
 
-          <div className="fixed bottom-4 left-4 right-4 mx-auto max-w-sm">
+          <div
+            className={cx(
+              "fixed bottom-4 left-4 right-4 mx-auto max-w-sm transition-all duration-300",
+              isMobileExpanded ? "" : "md:bottom-4 bottom-6",
+            )}
+          >
             <div className="rounded-lg bg-white p-3 shadow-lg relative">
               <div className="flex items-center justify-between gap-3">
                 <button
