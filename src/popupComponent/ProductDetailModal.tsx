@@ -365,7 +365,7 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
       <div
         className={cx(
           "fixed md:h-full m-auto bottom-0 md:top-0 z-100 animate-slideInUp left-0 w-full flex items-end justify-center transition-all",
-          isMobileExpanded ? "h-full" : "h-[80vh]",
+          isMobileExpanded ? "h-full" : "h-[70vh]",
         )}
         onClick={handleOverlayClick}
       >
@@ -463,12 +463,13 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
 
           <div
             className={cx(
+              "mobile-scroll-hidden md:scrollbar-auto",
               "bg-white px-4 py-4 overflow-y-auto",
               isMobileExpanded ? "pb-24" : "pb-32",
               "md:max-h-[calc(100%-270px)] md:pb-24",
               isMobileExpanded
                 ? "max-h-[calc(100%-300px)]"
-                : "max-h-[calc(80vh-200px)]",
+                : "max-h-[calc(70vh-200px)]",
             )}
             onScroll={handleContentScroll}
           >
@@ -525,7 +526,7 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
                             )}
                           >
                             <div className="flex items-center flex-1">
-                              {currentVariantForOption ? (
+                              {currentVariantForOption && (
                                 <>
                                   <div className="w-8 h-8 mr-3 rounded overflow-hidden flex-shrink-0 relative">
                                     {currentVariantForOption.image && (
@@ -555,14 +556,6 @@ export const ProductDetailModal: FC<IProductDetailModalProps> = ({
                                     </span>
                                   </div>
                                 </>
-                              ) : (
-                                <span
-                                  className={cx("text-gray-500", {
-                                    "text-red-500": variantErrors[option.name],
-                                  })}
-                                >
-                                  Chọn {option.name}
-                                </span>
                               )}
                             </div>
 

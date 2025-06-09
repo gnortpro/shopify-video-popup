@@ -90,6 +90,26 @@
   }
 }
 
+@media (min-width: 768px) {
+  .mobile-scroll-hidden {
+    scrollbar-width: auto;
+    -ms-overflow-style: auto;
+  }
+
+  .mobile-scroll-hidden::-webkit-scrollbar {
+    display: block;
+  }
+}
+
+.mobile-scroll-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
 .animate-slideInUp {
   animation: slideInUp 200ms ease-in-out;
 }
